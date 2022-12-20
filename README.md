@@ -23,3 +23,12 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### Roadmap
+
+- Fix collision math (make ships transfer momentum to eachother, and not teleport off planets - gonna need trig).
+- Finite fuel, replenishes in proximity to sun.
+- Fuel decreases on collision
+- Win condition on exiting blastzone
+- Ship position shown on edge of screen when out of screen.
+
