@@ -6,8 +6,8 @@ import MusicControl from './gameMusic/MusicControl.vue';
 let ship1Data = reactive({
     positionX: 350,
     positionY: 150,
-    speedX: 0.2,
-    speedY: 0.2,
+    speedX: 0.1,
+    speedY: 0.1,
     radius: 5,
     rearEngineOn: false,
     leftEngineOn: false,
@@ -19,8 +19,8 @@ let ship1Data = reactive({
 const planet1Data = {
     positionX: 250,
     positionY: 250,
-    radius: 50,
-    mass: 16,
+    radius: 30,
+    mass: 5,
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -121,7 +121,7 @@ export default defineComponent({
             Orbital Fighting Game
         </h1>
         <div class="game-screen">
-            <svg class="spaaace" viewBox="0 0 2200 1080">
+            <svg class="spaaace" viewBox="0 0 1100 540">
                 <defs>
                     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
