@@ -12,9 +12,23 @@ let ship1Data = reactive({
     rearEngineOn: false,
     leftEngineOn: false,
     rightEngineOn: false,
-    angle: 0,
+    angleRadians: 0,
     angularMomentum: 0,
 });
+
+let ship2Data = reactive({
+    positionX: 500,
+    positionY: 350,
+    speedX: 0.0001,
+    speedY: 0.0001,
+    radius: 5,
+    rearEngineOn: false,
+    leftEngineOn: false,
+    rightEngineOn: false,
+    angleRadians: 0,
+    angularMomentum: 0,
+});
+
 
 const planet1Data = {
     positionX: 250,
@@ -48,6 +62,15 @@ const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "w") {
         ship1Data.rearEngineOn = true;
     }
+    if (e.key === "l") {
+        ship2Data.leftEngineOn = true;
+    }
+    if (e.key === "j") {
+        ship2Data.rightEngineOn = true;
+    }
+    if (e.key === "i") {
+        ship2Data.rearEngineOn = true;
+    }
 }
 
 const handleKeyup = (e: KeyboardEvent) => {
@@ -59,6 +82,15 @@ const handleKeyup = (e: KeyboardEvent) => {
     }
     if (e.key === "") {
         ship1Data.rearEngineOn = false;
+    }
+    if (e.key === "l") {
+        ship2Data.leftEngineOn = false;
+    }
+    if (e.key === "j") {
+        ship2Data.rightEngineOn = false;
+    }
+    if (e.key === "i") {
+        ship2Data.rearEngineOn = false;
     }
 }
 
@@ -89,32 +121,67 @@ const gravityAccelerationY = (planetData: { mass: number, positionX: number, pos
     return planetData.mass * directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) / (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY))
 }
 
+const collisionAccelerationX = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
+    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
+        return 0;
+    }
+    return -2 * shipData.speedX * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY)
+}
+const collisionAccelerationY = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
+    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
+        return 0;
+    }
+    return - 2 * shipData.speedY * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY)
+}
+const collisionFixX = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
+    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
+        return shipData.positionX;
+    }
+    return planetData.positionX - directionMultiplier(shipData.positionX, planetData.positionX) * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) * (planetData.radius + shipData.radius + 5)
+}
+const collisionFixY = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
+    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
+        return shipData.positionY;
+    }
+
+    return planetData.positionY - directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) * (planetData.radius + shipData.radius + 5)
+}
+
 
 const updateShipData = () => {
-    ship1Data.positionX = ship1Data.positionX + ship1Data.speedX;
-    ship1Data.positionY = ship1Data.positionY + ship1Data.speedY;
-    ship1Data.speedX = ship1Data.speedX + gravityAccelerationX(planet1Data, ship1Data);
-    ship1Data.speedY = ship1Data.speedY + gravityAccelerationY(planet1Data, ship1Data);
-    ship1Data.speedX = ship1Data.speedX + gravityAccelerationX(planet2Data, ship1Data);
-    ship1Data.speedY = ship1Data.speedY + gravityAccelerationY(planet2Data, ship1Data);
-    ship1Data.speedX = ship1Data.speedX + gravityAccelerationX(planet3Data, ship1Data);
-    ship1Data.speedY = ship1Data.speedY + gravityAccelerationY(planet3Data, ship1Data);
+    ship1Data.speedX = ship1Data.speedX + collisionAccelerationX(ship2Data, ship1Data);
+    ship1Data.speedY = ship1Data.speedY + collisionAccelerationY(ship2Data, ship1Data);
+    ship1Data.positionX = collisionFixX(ship2Data, ship1Data);
+    ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
+    ship2Data.speedX = ship2Data.speedX + collisionAccelerationX(ship1Data, ship2Data);
+    ship2Data.speedY = ship2Data.speedY + collisionAccelerationY(ship1Data, ship2Data);
+    ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
+    ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
+    [ship1Data, ship2Data].forEach(shipData => {
+        shipData.positionX = shipData.positionX + shipData.speedX;
+        shipData.positionY = shipData.positionY + shipData.speedY;
+        [planet1Data, planet2Data, planet3Data].forEach(planetData => {
+            shipData.speedX = shipData.speedX + gravityAccelerationX(planetData, shipData);
+            shipData.speedY = shipData.speedY + gravityAccelerationY(planetData, shipData);
+            shipData.speedX = shipData.speedX + collisionAccelerationX(planetData, shipData);
+            shipData.speedY = shipData.speedY + collisionAccelerationY(planetData, shipData);
+            shipData.positionX = collisionFixX(planetData, shipData);
+            shipData.positionY = collisionFixY(planetData, shipData);
+        });
 
-    ship1Data.angle = ship1Data.angle + ship1Data.angularMomentum;
-    ship1Data.angularMomentum *= 0.95
-    if (ship1Data.leftEngineOn) {
-        ship1Data.angularMomentum += 0.005
-    }
-    if (ship1Data.rightEngineOn) {
-        ship1Data.angularMomentum -= 0.005
-    }
-    if (ship1Data.rearEngineOn) {
-        console.log(ship1Data.angle)
-        console.log(Math.cos(ship1Data.angle))
-        console.log(Math.sin(ship1Data.angle))
-        ship1Data.speedX = ship1Data.speedX + 0.0015 * Math.cos(ship1Data.angle);
-        ship1Data.speedY = ship1Data.speedY + 0.0015 * Math.sin(ship1Data.angle);
-    }
+        shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
+        shipData.angularMomentum *= 0.99
+        if (shipData.leftEngineOn) {
+            shipData.angularMomentum += 0.002
+        }
+        if (shipData.rightEngineOn) {
+            shipData.angularMomentum -= 0.002
+        }
+        if (shipData.rearEngineOn) {
+            shipData.speedX = shipData.speedX + 0.0015 * Math.cos(shipData.angleRadians);
+            shipData.speedY = shipData.speedY + 0.0015 * Math.sin(shipData.angleRadians);
+        }
+    })
 
 }
 
@@ -123,7 +190,7 @@ var t = setInterval(updateShipData, 0.05);
 export default defineComponent({
     data() {
         return {
-            ship1Data, planet1Data, planet2Data, planet3Data, pi: Math.PI
+            ship1Data, ship2Data, planet1Data, planet2Data, planet3Data, pi: Math.PI
         }
     },
 
@@ -149,6 +216,10 @@ export default defineComponent({
                         <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
                         <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
                     </linearGradient>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(255,0,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,255,255);stop-opacity:1" />
+                    </linearGradient>
                 </defs>
                 <circle class="planet1" :cx="planet1Data.positionX" :cy="planet1Data.positionY" :r="planet1Data.radius"
                     fill="white" />
@@ -157,8 +228,11 @@ export default defineComponent({
                 <circle class="planet3" :cx="planet3Data.positionX" :cy="planet3Data.positionY" :r="planet3Data.radius"
                     fill="green" />
                 <circle class="ship1" :cx="ship1Data.positionX" :cy="ship1Data.positionY" :r="ship1Data.radius"
-                    :transform="`rotate(${180 * ship1Data.angle / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
+                    :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
                     fill="url(#grad1)" />
+                <circle class="ship2" :cx="ship2Data.positionX" :cy="ship2Data.positionY" :r="ship2Data.radius"
+                    :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
+                    fill="url(#grad2)" />
             </svg>
             <div class="music-control-box">
                 <MusicControl />
