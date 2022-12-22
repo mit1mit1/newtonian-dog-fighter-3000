@@ -77,7 +77,6 @@ html {
     width: 1100px;
     height: 540px;
     position: relative;
-    margin-bottom: 10px;
     overflow: visible;
 }
 
@@ -105,5 +104,4 @@ html {
     background-color: #ffb7c5;
     cursor: pointer;
 }
-
 </style>
