@@ -187,6 +187,20 @@ const collisionFixY = (planetData: { radius: number, positionX: number, position
     return planetData.positionY - directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) * (planetData.radius + shipData.radius + 3)
 }
 
+const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }, secondShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }) => {
+    if (distanceSquared(firstShipData.positionX, secondShipData.positionX, firstShipData.positionY, secondShipData.positionY) > (firstShipData.radius + secondShipData.radius) ** 2) {
+        return;
+    }
+    const firstSpeedX = firstShipData.speedX;
+    const secondSpeedX = secondShipData.speedX;
+    const firstSpeedY = firstShipData.speedY;
+    const secondSpeedY = secondShipData.speedY;
+    firstShipData.speedX = 0.25 * firstSpeedX + 0.75 * secondSpeedX
+    firstShipData.speedY = 0.25 * firstSpeedY + 0.75 * secondSpeedY
+    secondShipData.speedX = 0.25 * secondSpeedX + 0.75 * firstSpeedX
+    secondShipData.speedY = 0.25 * secondSpeedY + 0.75 * firstSpeedY
+}
+
 
 const updateShipData = () => {
     // ship1Data.speedX = ship1Data.speedX + collisionAccelerationX(ship2Data, ship1Data);
@@ -195,6 +209,7 @@ const updateShipData = () => {
     // ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
     // ship2Data.speedX = ship2Data.speedX + collisionAccelerationX(ship1Data, ship2Data);
     // ship2Data.speedY = ship2Data.speedY + collisionAccelerationY(ship1Data, ship2Data);
+    applyCollisionSpeedChange(ship1Data, ship2Data);
     ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
     ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
     [ship1Data, ship2Data].forEach(shipData => {
@@ -263,8 +278,7 @@ export default defineComponent({
                         <stop offset="100%" style="stop-color:rgb(0,255,255);stop-opacity:1" />
                     </linearGradient>
                 </defs>
-                <circle class="sun" :cx="sunData.positionX" :cy="sunData.positionY" :r="sunData.radius"
-                    fill="yellow" />
+                <circle class="sun" :cx="sunData.positionX" :cy="sunData.positionY" :r="sunData.radius" fill="yellow" />
                 <circle class="planet1" :cx="planet1Data.positionX" :cy="planet1Data.positionY" :r="planet1Data.radius"
                     fill="white" />
                 <circle class="planet2" :cx="planet2Data.positionX" :cy="planet2Data.positionY" :r="planet2Data.radius"
