@@ -1,69 +1,88 @@
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
 import MusicControl from './gameMusic/MusicControl.vue';
+import { distanceSquared } from "./utils/math";
+import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "./utils/physics";
 
 
 let ship1Data = reactive({
-    positionX: 350,
-    positionY: 150,
-    speedX: 0.001,
+    positionX: 550,
+    positionY: 100,
+    speedX: 0.4,
     speedY: 0.001,
-    radius: 5,
+    radius: 7,
     rearEngineOn: false,
     leftEngineOn: false,
     rightEngineOn: false,
     angleRadians: 0,
     angularMomentum: 0,
+    health: 5000,
 });
 
 let ship2Data = reactive({
-    positionX: 500,
-    positionY: 350,
-    speedX: 0.0001,
-    speedY: 0.0001,
-    radius: 5,
+    positionX: 550,
+    positionY: 440,
+    speedX: -0.4,
+    speedY: -0.001,
+    radius: 7,
     rearEngineOn: false,
     leftEngineOn: false,
     rightEngineOn: false,
     angleRadians: 0,
     angularMomentum: 0,
+    health: 5000,
 });
 
+const planet1Data = {
+    positionX: 260,
+    positionY: 270,
+    radius: 30,
+    mass: 1,
+}
+
+const planet2Data = {
+    positionX: 840,
+    positionY: 270,
+    radius: 30,
+    mass: 1,
+}
 
 const sunData = {
     positionX: 550,
     positionY: 270,
     radius: 100,
-    mass: 30,
+    mass: 35,
 }
 
-const planet1Data = {
-    positionX: 300,
-    positionY: 250,
-    radius: 40,
-    mass: 10,
-}
-
-const planet2Data = {
-    positionX: 800,
-    positionY: 250,
-    radius: 40,
-    mass: 10,
-}
 
 const planet3Data = {
     positionX: 400,
-    positionY: 300,
-    radius: 30,
-    mass: 6,
+    positionY: 310,
+    radius: 22,
+    mass: 0.5,
 }
 
 const planet4Data = {
     positionX: 400,
-    positionY: 200,
-    radius: 30,
-    mass: 6,
+    positionY: 230,
+    radius: 22,
+    mass: 0.5,
 }
+
+const planet5Data = {
+    positionX: 700,
+    positionY: 310,
+    radius: 22,
+    mass: 0.5,
+}
+
+const planet6Data = {
+    positionX: 700,
+    positionY: 230,
+    radius: 22,
+    mass: 0.5,
+}
+
 
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -112,79 +131,19 @@ document.addEventListener("keydown", handleKeydown);
 document.addEventListener("keyup", handleKeyup);
 
 
-const distanceSquared = (x1: number, x2: number, y1: number, y2: number) => {
-    return (x2 - x1) ** 2 + (y2 - y1) ** 2
+
+const getPlanetDamage = (shipData: { radius: number, positionX: number, positionY: number }, planetData: { positionX: number, positionY: number, radius: number }) => {
+    if (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) < (shipData.radius + 2 + planetData.radius) ** 2) {
+        return 1;
+    }
+    return 0;
 }
 
-const directionMultiplier = (x1: number, x2: number) => {
-    return (x2 - x1) / Math.abs(x1 - x2)
-}
-
-const xComponent = (x1: number, x2: number, y1: number, y2: number) => {
-    return (x2 - x1) ** 2 / ((x2 - x1) ** 2 + (y2 - y1) ** 2)
-}
-
-const yComponent = (x1: number, x2: number, y1: number, y2: number) => {
-    return (y2 - y1) ** 2 / ((x2 - x1) ** 2 + (y2 - y1) ** 2)
-}
-
-const gravityAccelerationX = (planetData: { radius: number, mass: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, },) => {
-    const d2 = (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY));
-    if (d2 < 4) {
-        return 0
-    } else if (d2 < planetData.radius ** 2) {
-        return planetData.mass * directionMultiplier(shipData.positionX, planetData.positionX) * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) / d2 ** 3
+const getOutOfMapDamage = (shipData: { positionX: number, positionY: number }) => {
+    if (distanceSquared(shipData.positionX, 0, shipData.positionY, 0) > 1500 ** 2) {
+        return 5;
     }
-    return planetData.mass * directionMultiplier(shipData.positionX, planetData.positionX) * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) / d2
-}
-const gravityAccelerationY = (planetData: { radius: number, mass: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, },) => {
-    const d2 = (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY));
-    if (d2 < (0.25 * planetData.radius) ** 2) {
-        return 0
-    } else if (d2 < planetData.radius ** 2) {
-        return 0.01 * planetData.mass * directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) / d2
-    }
-    return planetData.mass * directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) / d2
-}
-
-const collisionAccelerationX = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return 0;
-    }
-    return -1.75 * shipData.speedX * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY)
-}
-const collisionAccelerationY = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return 0;
-    }
-    return -1.75 * shipData.speedY * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY)
-}
-
-const resistanceAdjustmentX = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return shipData.speedX;
-    }
-    return shipData.speedX * 0.999
-}
-const resistanceAdjustmentY = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return shipData.speedY;
-    }
-    return shipData.speedY * 0.999
-}
-
-const collisionFixX = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return shipData.positionX;
-    }
-    return planetData.positionX - directionMultiplier(shipData.positionX, planetData.positionX) * xComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) * (planetData.radius + shipData.radius + 3)
-}
-const collisionFixY = (planetData: { radius: number, positionX: number, positionY: number, }, shipData: { positionX: number, positionY: number, radius: number, speedX: number, speedY: number },) => {
-    if (distanceSquared(planetData.positionX, shipData.positionX, planetData.positionY, shipData.positionY) > (planetData.radius + shipData.radius) ** 2) {
-        return shipData.positionY;
-    }
-
-    return planetData.positionY - directionMultiplier(shipData.positionY, planetData.positionY) * yComponent(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) * (planetData.radius + shipData.radius + 3)
+    return 0;
 }
 
 const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }, secondShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }) => {
@@ -215,7 +174,17 @@ const updateShipData = () => {
     [ship1Data, ship2Data].forEach(shipData => {
         shipData.positionX = shipData.positionX + shipData.speedX;
         shipData.positionY = shipData.positionY + shipData.speedY;
-        [sunData, planet1Data, planet2Data, planet3Data, planet4Data].forEach(planetData => {
+        shipData.health = shipData.health - getOutOfMapDamage(shipData);
+        [
+            sunData,
+            planet1Data,
+            planet2Data,
+            planet3Data,
+            planet4Data,
+            planet5Data,
+            planet6Data
+        ].forEach(planetData => {
+            shipData.health = shipData.health - getPlanetDamage(shipData, planetData);
             shipData.speedX = shipData.speedX + gravityAccelerationX(planetData, shipData);
             shipData.speedY = shipData.speedY + gravityAccelerationY(planetData, shipData);
             // shipData.speedX = shipData.speedX + collisionAccelerationX(planetData, shipData);
@@ -227,16 +196,16 @@ const updateShipData = () => {
         });
 
         shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
-        shipData.angularMomentum *= 0.99
+        shipData.angularMomentum *= 0.985
         if (shipData.leftEngineOn) {
-            shipData.angularMomentum += 0.001
+            shipData.angularMomentum += 0.0007
         }
         if (shipData.rightEngineOn) {
-            shipData.angularMomentum -= 0.001
+            shipData.angularMomentum -= 0.0007
         }
         if (shipData.rearEngineOn) {
-            shipData.speedX = shipData.speedX + 0.0015 * Math.cos(shipData.angleRadians);
-            shipData.speedY = shipData.speedY + 0.0015 * Math.sin(shipData.angleRadians);
+            shipData.speedX = shipData.speedX + 0.001 * Math.cos(shipData.angleRadians);
+            shipData.speedY = shipData.speedY + 0.001 * Math.sin(shipData.angleRadians);
         }
     })
 
@@ -247,7 +216,8 @@ var t = setInterval(updateShipData, 0.05);
 export default defineComponent({
     data() {
         return {
-            ship1Data, ship2Data, sunData, planet1Data, planet2Data, planet3Data, planet4Data, pi: Math.PI
+            ship1Data, ship2Data, sunData, planet1Data, planet2Data, planet3Data, planet4Data, pi: Math.PI, planet5Data
+            , planet6Data
         }
     },
 
@@ -287,6 +257,10 @@ export default defineComponent({
                     fill="green" />
                 <circle class="planet4" :cx="planet4Data.positionX" :cy="planet4Data.positionY" :r="planet4Data.radius"
                     fill="teal" />
+                <circle class="planet5" :cx="planet5Data.positionX" :cy="planet5Data.positionY" :r="planet5Data.radius"
+                    fill="orange" />
+                <circle class="planet6" :cx="planet6Data.positionX" :cy="planet6Data.positionY" :r="planet6Data.radius"
+                    fill="brown" />
                 <circle class="ship1" :cx="ship1Data.positionX" :cy="ship1Data.positionY" :r="ship1Data.radius"
                     :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
                     fill="url(#grad1)" />
@@ -294,6 +268,8 @@ export default defineComponent({
                     :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
                     fill="url(#grad2)" />
             </svg>
+            <div>Ship 1 Health: {{ ship1Data.health }}</div>
+            <div>Ship 2 Health: {{ ship2Data.health }}</div>
             <div class="music-control-box">
                 <MusicControl />
             </div>
