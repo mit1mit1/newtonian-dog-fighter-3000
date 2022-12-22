@@ -31,4 +31,9 @@ npm run build
 - Fuel decreases on collision
 - Win condition on exiting blastzone
 - Ship position shown on edge of screen when out of screen.
+- Instructions
+- Ships can raise shields for extra/decreased knockback?
+- Other moves?
+- Ship selection and customization?
+- Map selection?
 
