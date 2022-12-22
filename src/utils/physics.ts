@@ -5,7 +5,7 @@ import {
   yComponent,
 } from "./math";
 
-const emptySpaceResistanceMultiplier = 0.99999;
+const emptySpaceResistanceMultiplier = 0.999995;
 
 export const gravityAccelerationX = (
   planetData: {
@@ -90,71 +90,6 @@ export const gravityAccelerationY = (
         planetData.positionY
       )) /
     d2
-  );
-};
-
-export const collisionAccelerationX = (
-  planetData: { radius: number; positionX: number; positionY: number },
-  shipData: {
-    positionX: number;
-    positionY: number;
-    radius: number;
-    speedX: number;
-    speedY: number;
-  }
-) => {
-  if (
-    distanceSquared(
-      planetData.positionX,
-      shipData.positionX,
-      planetData.positionY,
-      shipData.positionY
-    ) >
-    (planetData.radius + shipData.radius) ** 2
-  ) {
-    return 0;
-  }
-  return (
-    -1.75 *
-    shipData.speedX *
-    xComponent(
-      shipData.positionX,
-      planetData.positionX,
-      shipData.positionY,
-      planetData.positionY
-    )
-  );
-};
-export const collisionAccelerationY = (
-  planetData: { radius: number; positionX: number; positionY: number },
-  shipData: {
-    positionX: number;
-    positionY: number;
-    radius: number;
-    speedX: number;
-    speedY: number;
-  }
-) => {
-  if (
-    distanceSquared(
-      planetData.positionX,
-      shipData.positionX,
-      planetData.positionY,
-      shipData.positionY
-    ) >
-    (planetData.radius + shipData.radius) ** 2
-  ) {
-    return 0;
-  }
-  return (
-    -1.75 *
-    shipData.speedY *
-    yComponent(
-      shipData.positionX,
-      planetData.positionX,
-      shipData.positionY,
-      planetData.positionY
-    )
   );
 };
 
@@ -303,7 +238,6 @@ export const densityColorMultiplier = (
   },
   seed: number
 ) => {
-  console.log('yo')
   return (
     Math.floor(
       ((254 * density({ mass, radius })) /

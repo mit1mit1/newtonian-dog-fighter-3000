@@ -1,18 +1,21 @@
 <script lang="ts">
+import { blastZoneCenterX, blastZoneCenterY, blastZoneRadiusX, blastZoneRadiusY } from "@/constants/mapNumbers.js";
 import { planets } from "@/constants/planets";
 import { distanceSquared } from "@/utils/math";
 import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "@/utils/physics";
 import { defineComponent, reactive } from "vue";
 
+const frameMilliseconds = 2;
 const maxHealth = 5000;
-const blastZoneRadius = 1300;
+
+const baseShipRadius = 7;
 
 let ship1Data = reactive({
     positionX: 550,
     positionY: 100,
     speedX: 0.4,
     speedY: 0.001,
-    radius: 7,
+    radius: baseShipRadius,
     rearEngineOn: false,
     leftEngineOn: false,
     rightEngineOn: false,
@@ -28,7 +31,7 @@ let ship2Data = reactive({
     positionY: 440,
     speedX: -0.4,
     speedY: -0.001,
-    radius: 7,
+    radius: baseShipRadius,
     rearEngineOn: false,
     leftEngineOn: false,
     rightEngineOn: false,
@@ -38,6 +41,20 @@ let ship2Data = reactive({
     rearEngineThrust: 0.0018,
     sideEngineThrust: 0.0007,
 });
+
+const enlargen = (shipData: { radius: number }) => {
+    if (shipData.radius === baseShipRadius) {
+        shipData.radius += 5;
+        setTimeout(() => shipData.radius -= 5, frameMilliseconds * 60)
+    }
+}
+
+const hide = (shipData: { radius: number }) => {
+    if (shipData.radius === baseShipRadius) {
+        shipData.radius = 0;
+        setTimeout(() => shipData.radius = baseShipRadius, frameMilliseconds * 100)
+    }
+}
 
 const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "d") {
@@ -49,6 +66,12 @@ const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "w") {
         ship1Data.rearEngineOn = true;
     }
+    if (e.key === "q") {
+        enlargen(ship1Data);
+    }
+    if (e.key === "e") {
+        hide(ship1Data);
+    }
     if (e.key === "l") {
         ship2Data.leftEngineOn = true;
     }
@@ -57,6 +80,12 @@ const handleKeydown = (e: KeyboardEvent) => {
     }
     if (e.key === "i") {
         ship2Data.rearEngineOn = true;
+    }
+    if (e.key === "u") {
+        enlargen(ship1Data);
+    }
+    if (e.key === "o") {
+        hide(ship1Data);
     }
 }
 
@@ -94,7 +123,7 @@ const getPlanetDamage = (shipData: { radius: number, positionX: number, position
 }
 
 const getOutOfMapDamage = (shipData: { positionX: number, positionY: number }) => {
-    if (distanceSquared(shipData.positionX, 0, shipData.positionY, 0) > blastZoneRadius ** 2) {
+    if (((shipData.positionX - blastZoneCenterX) / blastZoneRadiusX) ** 2 + ((shipData.positionY - blastZoneCenterY) / blastZoneRadiusY) ** 2 > 1) {
         return 10;
     }
     return 0;
@@ -108,10 +137,10 @@ const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: numb
     const secondSpeedX = secondShipData.speedX;
     const firstSpeedY = firstShipData.speedY;
     const secondSpeedY = secondShipData.speedY;
-    firstShipData.speedX = 0.25 * firstSpeedX + 0.75 * secondSpeedX
-    firstShipData.speedY = 0.25 * firstSpeedY + 0.75 * secondSpeedY
-    secondShipData.speedX = 0.25 * secondSpeedX + 0.75 * firstSpeedX
-    secondShipData.speedY = 0.25 * secondSpeedY + 0.75 * firstSpeedY
+    firstShipData.speedX = 0.2 * firstSpeedX + 0.85 * secondSpeedX
+    firstShipData.speedY = 0.2 * firstSpeedY + 0.85 * secondSpeedY
+    secondShipData.speedX = 0.2 * secondSpeedX + 0.85 * firstSpeedX
+    secondShipData.speedY = 0.2 * secondSpeedY + 0.85 * firstSpeedY
 }
 
 
@@ -157,7 +186,7 @@ const updateShipData = () => {
 
 }
 
-var t = setInterval(updateShipData, 0.05);
+var t = setInterval(updateShipData, frameMilliseconds);
 
 
 export default defineComponent({
@@ -180,8 +209,10 @@ export default defineComponent({
             <stop offset="100%" style="stop-color:rgb(0,255,255);stop-opacity:1" />
         </linearGradient>
     </defs>
-    <rect class="healthBar" x="50" y="500" :width="200 * ship1Data.health / maxHealth" height="20" rx="5" fill="url(#grad1)" />
-    <rect class="healthBar" x="800" y="500" :width="200 * ship2Data.health / maxHealth" height="20" rx="5" fill="url(#grad2)" />
+    <rect class="healthBar" x="50" y="500" :width="200 * ship1Data.health / maxHealth" height="20" rx="5"
+        fill="url(#grad1)" />
+    <rect class="healthBar" x="800" y="500" :width="200 * ship2Data.health / maxHealth" height="20" rx="5"
+        fill="url(#grad2)" />
     <circle class="ship1" :cx="ship1Data.positionX" :cy="ship1Data.positionY" :r="ship1Data.radius"
         :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
         fill="url(#grad1)" />
@@ -197,4 +228,4 @@ export default defineComponent({
         :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
         fill="url(#grad1)" />
 
-    </template>
+</template>

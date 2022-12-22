@@ -4,11 +4,17 @@ import MusicControl from './gameMusic/MusicControl.vue';
 import PlanetSVG from "./components/PlanetSVG.vue";
 import ShipSVGs from "./components/ShipSVGs.vue";
 import { planets } from "./constants/planets";
+import {
+    viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
+    blastZoneCenterY
+} from "./constants/mapNumbers";
 
 export default defineComponent({
     data() {
         return {
-            planets
+            planets, viewboxWidth,
+            viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
+            blastZoneCenterY
         }
     },
 
@@ -26,7 +32,15 @@ export default defineComponent({
             Orbital Fighting Game
         </h1> -->
         <div class="game-screen">
-            <svg class="spaaace" viewBox="0 0 1100 540">
+            <svg class="spaaace" :viewBox="`0 0 ${viewboxWidth} ${viewboxHeight}`">
+                <defs>
+                    <linearGradient id="space" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(80,50,0);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,20,80);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <ellipse fill="url(#space)" :cx="blastZoneCenterX" :cy="blastZoneCenterY" :rx="blastZoneRadiusX"
+                    :ry="blastZoneRadiusY" />
                 <PlanetSVG v-for="planet in planets" :positionX="planet.positionX" :positionY="planet.positionY"
                     :radius="planet.radius" :mass="planet.mass" />
                 <ShipSVGs />
@@ -35,9 +49,9 @@ export default defineComponent({
                 <span class="healthInfo">Ship 1 Health: {{ ship1Data.health }}</span>
                 <span class="healthInfo">Ship 2 Health: {{ ship2Data.health }}</span>
             </div> -->
-            <div class="music-control-box">
+            <!-- <div class="music-control-box">
                 <MusicControl />
-            </div>
+            </div> -->
         </div>
     </main>
 </template>
@@ -55,12 +69,11 @@ h1 {
 }
 
 html {
-    background-color: #eee;
+    background-color: rgb(80,40,80);
     font-family: Merriweather;
 }
 
 .spaaace {
-    background-color: black;
     width: 1100px;
     height: 540px;
     position: relative;
@@ -72,7 +85,6 @@ html {
     margin-left: auto;
     margin-right: auto;
     max-width: 1100px;
-    margin-bottom: 100px;
 }
 
 
@@ -94,8 +106,4 @@ html {
     cursor: pointer;
 }
 
-.music-control-box {
-    position: absolute;
-    top: 40px;
-}
 </style>

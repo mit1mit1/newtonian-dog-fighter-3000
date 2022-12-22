@@ -4,7 +4,7 @@ const planet1Data = {
     positionY: 270,
     radius: 30,
     mass: 1,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 const planet2Data = {
@@ -12,7 +12,7 @@ const planet2Data = {
     positionY: 270,
     radius: 30,
     mass: 1,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 const sunData = {
@@ -20,7 +20,7 @@ const sunData = {
     positionY: 270,
     radius: 100,
     mass: 39,
-    resistanceMultiplier: 0.9995,
+    resistanceMultiplier: 0.9997,
 }
 
 
@@ -29,7 +29,7 @@ const planet3Data = {
     positionY: 310,
     radius: 22,
     mass: 0.5,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 const planet4Data = {
@@ -37,7 +37,7 @@ const planet4Data = {
     positionY: 230,
     radius: 22,
     mass: 0.5,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 const planet5Data = {
@@ -45,7 +45,7 @@ const planet5Data = {
     positionY: 310,
     radius: 22,
     mass: 0.5,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 const planet6Data = {
@@ -53,7 +53,7 @@ const planet6Data = {
     positionY: 230,
     radius: 22,
     mass: 0.5,
-    resistanceMultiplier: 0.9998,
+    resistanceMultiplier: 0.9999,
 }
 
 export const planets = [
