@@ -175,7 +175,7 @@ export const resistanceAdjustmentX = (
     ) >
     (planetData.radius + shipData.radius) ** 2
   ) {
-    return shipData.speedX;
+    return shipData.speedX * 0.99999;
   }
   return shipData.speedX * 0.999;
 };
@@ -198,7 +198,7 @@ export const resistanceAdjustmentY = (
     ) >
     (planetData.radius + shipData.radius) ** 2
   ) {
-    return shipData.speedY;
+    return shipData.speedY * 0.99999;
   }
   return shipData.speedY * 0.999;
 };

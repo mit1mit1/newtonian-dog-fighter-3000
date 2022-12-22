@@ -113,7 +113,7 @@ const handleKeyup = (e: KeyboardEvent) => {
     if (e.key === "a") {
         ship1Data.rightEngineOn = false;
     }
-    if (e.key === "") {
+    if (e.key === "w") {
         ship1Data.rearEngineOn = false;
     }
     if (e.key === "l") {
@@ -233,9 +233,9 @@ export default defineComponent({
 
 <template>
     <main id="clickableGame">
-        <h1>
+        <!-- <h1>
             Orbital Fighting Game
-        </h1>
+        </h1> -->
         <div class="game-screen">
             <svg class="spaaace" viewBox="0 0 1100 540">
                 <defs>
@@ -264,12 +264,22 @@ export default defineComponent({
                 <circle class="ship1" :cx="ship1Data.positionX" :cy="ship1Data.positionY" :r="ship1Data.radius"
                     :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
                     fill="url(#grad1)" />
+                <circle v-if="ship1Data.rearEngineOn" class="ship1Burner" :cx="ship1Data.positionX - 2 * ship1Data.radius / 3"
+                    :cy="ship1Data.positionY" :r="ship1Data.radius / 2"
+                    :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
+                    fill="url(#grad2)" />
                 <circle class="ship2" :cx="ship2Data.positionX" :cy="ship2Data.positionY" :r="ship2Data.radius"
                     :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
                     fill="url(#grad2)" />
+                <circle v-if="ship2Data.rearEngineOn" class="ship1Burner" :cx="ship2Data.positionX - 2 * ship2Data.radius / 3"
+                    :cy="ship2Data.positionY" :r="ship2Data.radius / 2"
+                    :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
+                    fill="url(#grad1)" />
             </svg>
-            <div>Ship 1 Health: {{ ship1Data.health }}</div>
-            <div>Ship 2 Health: {{ ship2Data.health }}</div>
+            <div>
+                <span class="healthInfo">Ship 1 Health: {{ ship1Data.health }}</span>
+                <span class="healthInfo">Ship 2 Health: {{ ship2Data.health }}</span>
+            </div>
             <div class="music-control-box">
                 <MusicControl />
             </div>
@@ -285,6 +295,10 @@ h1 {
     margin-bottom: 20px;
 }
 
+.healthInfo {
+    margin-right: 50px;
+}
+
 html {
     background-color: #eee;
     font-family: Merriweather;
@@ -295,6 +309,7 @@ html {
     width: 1100px;
     height: 540px;
     position: relative;
+    margin-bottom: 10px;
 }
 
 .game-screen {
