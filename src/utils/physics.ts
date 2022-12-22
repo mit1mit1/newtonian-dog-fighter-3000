@@ -5,6 +5,8 @@ import {
   yComponent,
 } from "./math";
 
+const emptySpaceResistanceMultiplier = 0.99999;
+
 export const gravityAccelerationX = (
   planetData: {
     radius: number;
@@ -157,7 +159,12 @@ export const collisionAccelerationY = (
 };
 
 export const resistanceAdjustmentX = (
-  planetData: { radius: number; positionX: number; positionY: number },
+  planetData: {
+    radius: number;
+    positionX: number;
+    positionY: number;
+    resistanceMultiplier: number;
+  },
   shipData: {
     positionX: number;
     positionY: number;
@@ -175,12 +182,17 @@ export const resistanceAdjustmentX = (
     ) >
     (planetData.radius + shipData.radius) ** 2
   ) {
-    return shipData.speedX * 0.99999;
+    return shipData.speedX * emptySpaceResistanceMultiplier;
   }
-  return shipData.speedX * 0.999;
+  return shipData.speedX * planetData.resistanceMultiplier;
 };
 export const resistanceAdjustmentY = (
-  planetData: { radius: number; positionX: number; positionY: number },
+  planetData: {
+    radius: number;
+    positionX: number;
+    positionY: number;
+    resistanceMultiplier: number;
+  },
   shipData: {
     positionX: number;
     positionY: number;
@@ -198,9 +210,9 @@ export const resistanceAdjustmentY = (
     ) >
     (planetData.radius + shipData.radius) ** 2
   ) {
-    return shipData.speedY * 0.99999;
+    return shipData.speedY * emptySpaceResistanceMultiplier;
   }
-  return shipData.speedY * 0.999;
+  return shipData.speedY * planetData.resistanceMultiplier;
 };
 
 export const collisionFixX = (
@@ -268,5 +280,37 @@ export const collisionFixY = (
         planetData.positionY
       ) *
       (planetData.radius + shipData.radius + 3)
+  );
+};
+
+export const density = ({
+  mass,
+  radius,
+}: {
+  radius?: number;
+  mass?: number;
+}) => {
+  return (mass ?? 0) / (Math.PI * (radius ?? 1) ** 2);
+};
+
+export const densityColorMultiplier = (
+  {
+    mass,
+    radius,
+  }: {
+    radius?: number;
+    mass?: number;
+  },
+  seed: number
+) => {
+  console.log('yo')
+  return (
+    Math.floor(
+      ((254 * density({ mass, radius })) /
+        (density({ mass, radius }) * seed + 0.002)) %
+        254
+    ) *
+      seed +
+    1
   );
 };
