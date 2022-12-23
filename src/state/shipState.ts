@@ -62,69 +62,75 @@ const initialShip2Data: ShipData = {
 export const ship2Data = reactive(initialShip2Data);
 
 export const setShipData = (stage: Stage) => {
-  if (stage === "battlefield") {
+  ship1Data.rearEngineOn = false;
+  ship1Data.leftEngineOn = false;
+  ship1Data.rightEngineOn = false;
+  ship1Data.afterburnerOn = false;
+  ship1Data.rearEngineThrust = 0.0018;
+  ship1Data.sideEngineThrust = 0.0007;
+  ship1Data.health = maxHealth;
+  ship1Data.moveLag = false;
+  ship1Data.radius = baseShipRadius;
+  ship1Data.angularMomentum = 0;
+
+  ship2Data.rearEngineOn = false;
+  ship2Data.leftEngineOn = false;
+  ship2Data.rightEngineOn = false;
+  ship2Data.afterburnerOn = false;
+  ship2Data.rearEngineThrust = 0.0018;
+  ship2Data.sideEngineThrust = 0.0007;
+  ship2Data.health = maxHealth;
+  ship2Data.moveLag = false;
+  ship2Data.radius = baseShipRadius;
+  ship2Data.angularMomentum = 0;
+
+  if (stage === "maw") {
     ship1Data.positionX = 550;
     ship1Data.positionY = 100;
-    ship1Data.speedX = 0.4;
+    ship1Data.speedX = 0.45;
     ship1Data.speedY = 0.001;
-    ship1Data.radius = baseShipRadius;
-    ship1Data.rearEngineOn = false;
-    ship1Data.leftEngineOn = false;
-    ship1Data.rightEngineOn = false;
-    ship1Data.afterburnerOn = false;
     ship1Data.angleRadians = 0;
-    ship1Data.angularMomentum = 0;
-    ship1Data.health = maxHealth;
-    ship1Data.rearEngineThrust = 0.0018;
-    ship1Data.sideEngineThrust = 0.0007;
-    ship1Data.moveLag = false;
 
     ship2Data.positionX = 550;
     ship2Data.positionY = 440;
-    ship2Data.speedX = -0.4;
+    ship2Data.speedX = -0.45;
     ship2Data.speedY = -0.001;
-    ship2Data.radius = baseShipRadius;
-    ship2Data.rearEngineOn = false;
-    ship2Data.leftEngineOn = false;
-    ship2Data.rightEngineOn = false;
-    ship2Data.afterburnerOn = false;
     ship2Data.angleRadians = 0;
-    ship2Data.angularMomentum = 0;
-    ship2Data.health = maxHealth;
-    ship2Data.rearEngineThrust = 0.0018;
-    ship2Data.sideEngineThrust = 0.0007;
-    ship2Data.moveLag = false;
+  } else if (stage === "kongoFalls") {
+    ship1Data.positionX = 550;
+    ship1Data.positionY = 100;
+    ship1Data.speedX = 0.45;
+    ship1Data.speedY = 0.001;
+    ship1Data.angleRadians = 0;
+
+    ship2Data.positionX = 550;
+    ship2Data.positionY = 440;
+    ship2Data.speedX = 0.45;
+    ship2Data.speedY = 0.001;
+    ship2Data.angleRadians = 0;
+  } else if (stage === "freefall") {
+    ship1Data.positionX = 550;
+    ship1Data.positionY = 100;
+    ship1Data.speedX = 0.001;
+    ship1Data.speedY = 0.001;
+    ship1Data.angleRadians = 0;
+
+    ship2Data.positionX = 550;
+    ship2Data.positionY = 440;
+    ship2Data.speedX = 0.001;
+    ship2Data.speedY = 0.001;
+    ship2Data.angleRadians = 0;
   } else {
     ship1Data.positionX = 550;
     ship1Data.positionY = 100;
     ship1Data.speedX = 0.4;
     ship1Data.speedY = 0.001;
-    ship1Data.radius = baseShipRadius;
-    ship1Data.rearEngineOn = false;
-    ship1Data.leftEngineOn = false;
-    ship1Data.rightEngineOn = false;
-    ship1Data.afterburnerOn = false;
     ship1Data.angleRadians = 0;
-    ship1Data.angularMomentum = 0;
-    ship1Data.health = maxHealth;
-    ship1Data.rearEngineThrust = 0.0018;
-    ship1Data.sideEngineThrust = 0.0007;
-    ship1Data.moveLag = false;
 
     ship2Data.positionX = 550;
     ship2Data.positionY = 440;
     ship2Data.speedX = -0.4;
     ship2Data.speedY = -0.001;
-    ship2Data.radius = baseShipRadius;
-    ship2Data.rearEngineOn = false;
-    ship2Data.leftEngineOn = false;
-    ship2Data.rightEngineOn = false;
-    ship2Data.afterburnerOn = false;
     ship2Data.angleRadians = 0;
-    ship2Data.angularMomentum = 0;
-    ship2Data.health = maxHealth;
-    ship2Data.rearEngineThrust = 0.0018;
-    ship2Data.sideEngineThrust = 0.0007;
-    ship2Data.moveLag = false;
   }
 };

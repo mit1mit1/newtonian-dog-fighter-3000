@@ -74,12 +74,16 @@ export default defineComponent({
                             <option value="battlefield">Battlefield</option>
                             <option value="finalDestination">Final Destination</option>
                             <option value="pokemonStadium">Pokemon Stadium</option>
+                            <option value="milkyWay">Milky Way</option>
+                            <option value="maw">Maw</option>
+                            <option value="kongoFalls">Kongo Falls</option>
+                            <option value="freefall">Freefall</option>
                         </select>
                     </div>
                     <MusicControl />
                 </div>
                 <div>
-                    <button class="napoleonic-button" :onclick="handleFinished">Close</button>
+                    <button class="napoleonic-button" :onclick="handleFinished">Start Game</button>
                 </div>
             </div>
         </div>
