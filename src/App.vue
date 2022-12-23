@@ -3,25 +3,28 @@ import { defineComponent } from "vue";
 import MusicControl from './gameMusic/MusicControl.vue';
 import PlanetSVG from "./components/PlanetSVG.vue";
 import ShipSVGs from "./components/ShipSVGs.vue";
-import { planets } from "./constants/planets";
+import { spaceState } from "./state/spaceState";
+import { planets } from "./state/planetState";
 import {
     viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
     blastZoneCenterY
 } from "./constants/mapNumbers";
+import NapoleonicModal from "./components/NapoleonicModal.vue";
 
 export default defineComponent({
     data() {
         return {
             planets, viewboxWidth,
             viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
-            blastZoneCenterY
+            blastZoneCenterY, spaceState
         }
     },
 
     components: {
         MusicControl,
         PlanetSVG,
-        ShipSVGs
+        ShipSVGs,
+        NapoleonicModal
     }
 });
 </script>
@@ -43,7 +46,7 @@ export default defineComponent({
                     :ry="blastZoneRadiusY" />
                 <PlanetSVG v-for="planet in planets" :positionX="planet.positionX" :positionY="planet.positionY"
                     :radius="planet.radius" :mass="planet.mass" />
-                <ShipSVGs />
+                <ShipSVGs v-if="spaceState.isStarted" />
             </svg>
             <!-- <div>
                 <span class="healthInfo">Ship 1 Health: {{ ship1Data.health }}</span>
@@ -54,6 +57,7 @@ export default defineComponent({
             </div> -->
         </div>
     </main>
+    <NapoleonicModal />
 </template>
 
 <style>
@@ -69,7 +73,7 @@ h1 {
 }
 
 html {
-    background-color: rgb(80,40,80);
+    background-color: rgb(80, 40, 80);
     font-family: Merriweather;
 }
 

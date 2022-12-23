@@ -1,85 +1,17 @@
 <script lang="ts">
 import { blastZoneCenterX, blastZoneCenterY, blastZoneRadiusX, blastZoneRadiusY } from "@/constants/mapNumbers.js";
-import { planets } from "@/constants/planets";
+import { planets } from "@/state/planetState";
+import { baseShipRadius, maxHealth } from "@/constants/ships";
+import { setShipData, ship1Data, ship2Data } from "@/state/shipState";
+import { spaceState } from "@/state/spaceState";
 import { distanceSquared } from "@/utils/math";
 import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "@/utils/physics";
-import { defineComponent, reactive } from "vue";
+import { defineComponent } from "vue";
+import { setupStage } from "@/utils/setupStage";
 
 const frameMilliseconds = 2;
-const maxHealth = 5000;
-
-const baseShipRadius = 7;
-
 let isRestarting = false;
-
-type ShipData = {
-    positionX: number,
-    positionY: number,
-    speedX: number,
-    speedY: number,
-    radius: number,
-    rearEngineOn: boolean,
-    leftEngineOn: boolean,
-    rightEngineOn: boolean,
-    afterburnerOn: boolean,
-    angleRadians: number,
-    angularMomentum: number,
-    health: number,
-    rearEngineThrust: number,
-    sideEngineThrust: number,
-    moveLag: boolean,
-}
-
-const initialShip1Data: ShipData = {
-    positionX: 550,
-    positionY: 100,
-    speedX: 0.4,
-    speedY: 0.001,
-    radius: baseShipRadius,
-    rearEngineOn: false,
-    leftEngineOn: false,
-    rightEngineOn: false,
-    afterburnerOn: false,
-    angleRadians: 0,
-    angularMomentum: 0,
-    health: maxHealth,
-    rearEngineThrust: 0.0018,
-    sideEngineThrust: 0.0007,
-    moveLag: false,
-};
-
-let ship1Data = reactive(initialShip1Data);
-
-const initialShip2Data: ShipData = {
-    positionX: 550,
-    positionY: 440,
-    speedX: -0.4,
-    speedY: -0.001,
-    radius: baseShipRadius,
-    rearEngineOn: false,
-    leftEngineOn: false,
-    rightEngineOn: false,
-    afterburnerOn: false,
-    angleRadians: 0,
-    angularMomentum: 0,
-    health: maxHealth,
-    rearEngineThrust: 0.0018,
-    sideEngineThrust: 0.0007,
-    moveLag: false,
-}
-
-let ship2Data = reactive(initialShip2Data);
-
-// const resetShipData = () => {
-//     console.log('resetting')
-//     for (const property in initialShip1Data) {
-//         console.log(property);
-//         ship1Data[property as any] = initialShip1Data[property as keyof ShipData];
-//     }
-//     for (const property in initialShip2Data) {
-//         ship2Data[property as any] = initialShip2Data[property as keyof ShipData];
-//     }
-// }
+let hasSetIsRestarting = false;
 
 const enlargen = (shipData: { radius: number, moveLag: boolean }) => {
     if (shipData.radius === baseShipRadius && !shipData.moveLag) {
@@ -203,7 +135,8 @@ const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: numb
 
 
 const updateShipData = () => {
-    if (!isRestarting) {
+    if (!isRestarting && spaceState.isStarted) {
+        
         applyCollisionSpeedChange(ship1Data, ship2Data);
         ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
         ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
@@ -235,16 +168,23 @@ const updateShipData = () => {
                 shipData.speedX = shipData.speedX + shipData.rearEngineThrust * 2.5 * Math.cos(shipData.angleRadians);
                 shipData.speedY = shipData.speedY + shipData.rearEngineThrust * 2.5 * Math.sin(shipData.angleRadians);
             }
-            // if (shipData.health <= 0 && isRestarting === false) {
-            // isRestarting = true;
-            // setTimeout(resetShipData, 3000)
-            // }
+            if (shipData.health <= 0 && isRestarting === false && hasSetIsRestarting === false) {
+                hasSetIsRestarting = true;
+                setTimeout(() => {
+                    isRestarting = true
+                }, 1000)
+                setTimeout(() => setupStage("random"), 3000)
+                setTimeout(() => {
+                    isRestarting = false
+                    hasSetIsRestarting = false
+                }, 3000)
+            }
         })
     }
 
 }
-
-setInterval(updateShipData, frameMilliseconds);
+console.log('setting t');
+let t = setInterval(updateShipData, frameMilliseconds);
 
 
 export default defineComponent({
@@ -279,8 +219,8 @@ export default defineComponent({
             :cy="ship1Data.positionY" :r="ship1Data.radius / 2"
             :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
             fill="url(#grad2)" />
-        <circle v-if="ship1Data.afterburnerOn" class="ship1Afterburner" :cx="ship1Data.positionX - 2 * ship1Data.radius / 3"
-            :cy="ship1Data.positionY" :r="2* ship1Data.radius / 3"
+        <circle v-if="ship1Data.afterburnerOn" class="ship1Afterburner"
+            :cx="ship1Data.positionX - 2 * ship1Data.radius / 3" :cy="ship1Data.positionY" :r="2 * ship1Data.radius / 3"
             :transform="`rotate(${180 * ship1Data.angleRadians / pi}, ${ship1Data.positionX}, ${ship1Data.positionY})`"
             fill="url(#grad2)" />
     </g>
@@ -295,8 +235,8 @@ export default defineComponent({
             :cy="ship2Data.positionY" :r="ship2Data.radius / 2"
             :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
             fill="url(#grad1)" />
-        <circle v-if="ship2Data.afterburnerOn" class="ship2Afterburner" :cx="ship2Data.positionX - 2 * ship2Data.radius / 3"
-            :cy="ship2Data.positionY" :r="2 * ship2Data.radius / 3"
+        <circle v-if="ship2Data.afterburnerOn" class="ship2Afterburner"
+            :cx="ship2Data.positionX - 2 * ship2Data.radius / 3" :cy="ship2Data.positionY" :r="2 * ship2Data.radius / 3"
             :transform="`rotate(${180 * ship2Data.angleRadians / pi}, ${ship2Data.positionX}, ${ship2Data.positionY})`"
             fill="url(#grad1)" />
     </g>
