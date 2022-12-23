@@ -78,6 +78,7 @@ export default defineComponent({
                             <option value="maw">Maw</option>
                             <option value="kongoFalls">Kongo Falls</option>
                             <option value="freefall">Freefall</option>
+                            <option value="junkyard">Junkyard</option>
                         </select>
                     </div>
                     <MusicControl />

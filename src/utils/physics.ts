@@ -1,3 +1,4 @@
+import type { MoveableSphereData } from "@/types";
 import {
   directionMultiplier,
   distanceSquared,
@@ -247,4 +248,29 @@ export const densityColorMultiplier = (
       seed +
     1
   );
+};
+
+export const applyCollisionSpeedChange = (
+  firstObjectData: MoveableSphereData,
+  secondObjectData: MoveableSphereData
+) => {
+  if (
+    distanceSquared(
+      firstObjectData.positionX,
+      secondObjectData.positionX,
+      firstObjectData.positionY,
+      secondObjectData.positionY
+    ) >
+    (firstObjectData.radius + secondObjectData.radius) ** 2
+  ) {
+    return;
+  }
+  const firstSpeedX = firstObjectData.speedX;
+  const secondSpeedX = secondObjectData.speedX;
+  const firstSpeedY = firstObjectData.speedY;
+  const secondSpeedY = secondObjectData.speedY;
+  firstObjectData.speedX = 0.2 * firstSpeedX + 0.85 * secondSpeedX;
+  firstObjectData.speedY = 0.2 * firstSpeedY + 0.85 * secondSpeedY;
+  secondObjectData.speedX = 0.2 * secondSpeedX + 0.85 * firstSpeedX;
+  secondObjectData.speedY = 0.2 * secondSpeedY + 0.85 * firstSpeedY;
 };

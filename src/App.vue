@@ -3,6 +3,7 @@ import { defineComponent } from "vue";
 import MusicControl from './gameMusic/MusicControl.vue';
 import PlanetSVG from "./components/PlanetSVG.vue";
 import ShipSVGs from "./components/ShipSVGs.vue";
+import AsteroidSVGs from "./components/AsteroidSVGs.vue";
 import { spaceState } from "./state/spaceState";
 import { planets } from "./state/planetState";
 import {
@@ -24,7 +25,8 @@ export default defineComponent({
         MusicControl,
         PlanetSVG,
         ShipSVGs,
-        NapoleonicModal
+        NapoleonicModal,
+        AsteroidSVGs,
     }
 });
 </script>
@@ -47,6 +49,7 @@ export default defineComponent({
                 <PlanetSVG v-for="planet in planets" :positionX="planet.positionX" :positionY="planet.positionY"
                     :radius="planet.radius" :mass="planet.mass" />
                 <ShipSVGs v-if="spaceState.isStarted" />
+                <AsteroidSVGs v-if="spaceState.isStarted" />
             </svg>
             <!-- <div>
                 <span class="healthInfo">Ship 1 Health: {{ ship1Data.health }}</span>

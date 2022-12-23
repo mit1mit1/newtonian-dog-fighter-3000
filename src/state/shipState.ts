@@ -1,14 +1,9 @@
 // store.js
 import { baseShipRadius, maxHealth } from "@/constants/ships";
-import type { Stage } from "@/types";
+import type { MoveableSphereData, Stage } from "@/types";
 import { reactive } from "vue";
 
-type ShipData = {
-  positionX: number;
-  positionY: number;
-  speedX: number;
-  speedY: number;
-  radius: number;
+type ShipData = MoveableSphereData & {
   rearEngineOn: boolean;
   leftEngineOn: boolean;
   rightEngineOn: boolean;

@@ -2,14 +2,14 @@
 import { blastZoneCenterX, blastZoneCenterY, blastZoneRadiusX, blastZoneRadiusY } from "@/constants/mapNumbers.js";
 import { planets } from "@/state/planetState";
 import { baseShipRadius, maxHealth } from "@/constants/ships";
-import { setShipData, ship1Data, ship2Data } from "@/state/shipState";
+import { ship1Data, ship2Data } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
 import { distanceSquared } from "@/utils/math";
 import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "@/utils/physics";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
+import { frameMilliseconds } from "@/constants/physics";
 
-const frameMilliseconds = 2;
 let isRestarting = false;
 let hasSetIsRestarting = false;
 
@@ -136,10 +136,12 @@ const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: numb
 
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
-        
+
         applyCollisionSpeedChange(ship1Data, ship2Data);
         ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
         ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
+        // ship1Data.positionX = collisionFixX(ship2Data, ship1Data);
+        // ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
         [ship1Data, ship2Data].forEach(shipData => {
             shipData.positionX = shipData.positionX + shipData.speedX;
             shipData.positionY = shipData.positionY + shipData.speedY;
@@ -183,14 +185,13 @@ const updateShipData = () => {
     }
 
 }
-console.log('setting t');
 let t = setInterval(updateShipData, frameMilliseconds);
 
 
 export default defineComponent({
     data() {
         return {
-            ship1Data, ship2Data, pi: Math.PI, planets, maxHealth
+            ship1Data, ship2Data, pi: Math.PI, maxHealth
         }
     },
 });
