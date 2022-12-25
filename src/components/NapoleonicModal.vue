@@ -66,7 +66,7 @@ export default defineComponent({
                     </ul>
                 </div>
                 <div class="controlsBlock">
-                    <div>
+                    <div class="control">
                         Stage:
                         <select @input="(event: any) => pickStage(event.target.value)" name="stagePicker"
                             id="stagePicker">
@@ -79,11 +79,12 @@ export default defineComponent({
                             <option value="kongoFalls">Kongo Falls</option>
                             <option value="freefall">Freefall</option>
                             <option value="junkyard">Junkyard</option>
+                            <option value="pinball">Pinball</option>
                         </select>
                     </div>
                     <MusicControl />
                 </div>
-                <div>
+                <div class="control">
                     <button class="napoleonic-button" :onclick="handleFinished">Start Game</button>
                 </div>
             </div>
@@ -92,6 +93,10 @@ export default defineComponent({
 </template>
 
 <style>
+.control {
+    margin-bottom: 10px;
+}
+
 .textBlock {
     display: inline;
     text-align: center;

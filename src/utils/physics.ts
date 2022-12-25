@@ -23,7 +23,7 @@ export const gravityAccelerationX = (
     shipData.positionY,
     planetData.positionY
   );
-  if (d2 < 4) {
+  if (d2 < Math.max((0.125 * planetData.radius) ** 2, 8)) {
     return 0;
   } else if (d2 < planetData.radius ** 2) {
     return (
@@ -35,7 +35,7 @@ export const gravityAccelerationX = (
           shipData.positionY,
           planetData.positionY
         )) /
-      d2 ** 3
+      d2 ** 1.5
     );
   }
   return (
@@ -65,12 +65,11 @@ export const gravityAccelerationY = (
     shipData.positionY,
     planetData.positionY
   );
-  if (d2 < (0.25 * planetData.radius) ** 2) {
+  if (d2 < Math.max((0.125 * planetData.radius) ** 2, 8)) {
     return 0;
   } else if (d2 < planetData.radius ** 2) {
     return (
-      (0.01 *
-        planetData.mass *
+      (planetData.mass *
         directionMultiplier(shipData.positionY, planetData.positionY) *
         yComponent(
           shipData.positionX,
@@ -78,7 +77,7 @@ export const gravityAccelerationY = (
           shipData.positionY,
           planetData.positionY
         )) /
-      d2
+      d2 ** 1.5
     );
   }
   return (

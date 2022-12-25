@@ -6,7 +6,8 @@ export type Stage =
   | "maw"
   | "kongoFalls"
   | "freefall"
-  | "junkyard";
+  | "junkyard"
+  | "pinball";
 
 export type MoveableSphereData = {
   positionX: number;

@@ -8,9 +8,11 @@ type PlanetData = {
   radius: number;
   mass: number;
   resistanceMultiplier: number;
+  damage: number;
 };
 
 const westBigPlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth - 290,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
@@ -19,6 +21,7 @@ const westBigPlanet = {
 };
 
 const eastBigPlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth + 290,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
@@ -27,6 +30,7 @@ const eastBigPlanet = {
 };
 
 const northBigPlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight - 200,
   radius: 30,
@@ -35,6 +39,7 @@ const northBigPlanet = {
 };
 
 const southBigPlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight + 200,
   radius: 30,
@@ -42,7 +47,18 @@ const southBigPlanet = {
   resistanceMultiplier: 0.9999,
 };
 
+const gaseousSystem = {
+  damage: 0,
+  positionX: 0.5 * viewboxWidth,
+  positionY: 0.5 * viewboxHeight,
+  radius: 500,
+  mass: 96,
+  resistanceMultiplier: 1,
+  damaging: false,
+};
+
 const middleSun = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight,
   radius: 100,
@@ -51,6 +67,7 @@ const middleSun = {
 };
 
 const farWestBlackHole = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth - 400,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
@@ -59,6 +76,7 @@ const farWestBlackHole = {
 };
 
 const middleBlackHole = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
@@ -67,6 +85,7 @@ const middleBlackHole = {
 };
 
 const westSun = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth - 200,
   positionY: 0.5 * viewboxHeight,
   radius: 80,
@@ -75,6 +94,7 @@ const westSun = {
 };
 
 const eastSun = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth + 200,
   positionY: 0.5 * viewboxHeight,
   radius: 80,
@@ -83,6 +103,7 @@ const eastSun = {
 };
 
 const northWestLittlePlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth - 150,
   positionY: 0.5 * viewboxHeight - 150,
   radius: 22,
@@ -91,6 +112,7 @@ const northWestLittlePlanet = {
 };
 
 const northEastLittlePlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth + 150,
   positionY: 0.5 * viewboxHeight - 150,
   radius: 22,
@@ -99,6 +121,7 @@ const northEastLittlePlanet = {
 };
 
 const southWestLittlePlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth - 150,
   positionY: 0.5 * viewboxHeight + 150,
   radius: 22,
@@ -107,6 +130,7 @@ const southWestLittlePlanet = {
 };
 
 const southEastLittlePlanet = {
+  damage: 1,
   positionX: 0.5 * viewboxWidth + 150,
   positionY: 0.5 * viewboxHeight + 150,
   radius: 22,
@@ -115,6 +139,7 @@ const southEastLittlePlanet = {
 };
 
 const planet3 = {
+  damage: 1,
   positionX: 400,
   positionY: 310,
   radius: 22,
@@ -123,6 +148,7 @@ const planet3 = {
 };
 
 const planet4 = {
+  damage: 1,
   positionX: 400,
   positionY: 230,
   radius: 22,
@@ -131,6 +157,7 @@ const planet4 = {
 };
 
 const planet5 = {
+  damage: 1,
   positionX: 700,
   positionY: 310,
   radius: 22,
@@ -139,6 +166,7 @@ const planet5 = {
 };
 
 const planet6 = {
+  damage: 1,
   positionX: 700,
   positionY: 230,
   radius: 22,
@@ -184,5 +212,9 @@ export const setPlanetData = (stage: Stage) => {
     planets.push(eastBigPlanet);
     planets.push(southEastLittlePlanet);
     planets.push(northEastLittlePlanet);
+  } else if (stage === "junkyard") {
+    planets.push(middleSun);
+  } else if (stage === "pinball") {
+    planets.push(gaseousSystem);
   }
 };

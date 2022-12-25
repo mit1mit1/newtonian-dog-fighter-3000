@@ -9,6 +9,7 @@ import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAcceleration
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
 import { frameMilliseconds } from "@/constants/physics";
+import { asteroids } from "@/state/asteroidState";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -105,9 +106,9 @@ document.addEventListener("keyup", handleKeyup);
 
 
 
-const getPlanetDamage = (shipData: { radius: number, positionX: number, positionY: number }, planetData: { positionX: number, positionY: number, radius: number }) => {
+const getPlanetDamage = (shipData: { radius: number, positionX: number, positionY: number }, planetData: { positionX: number, positionY: number, radius: number, damage: number }) => {
     if (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) < (shipData.radius + 2 + planetData.radius) ** 2) {
-        return 1;
+        return planetData.damage;
     }
     return 0;
 }
@@ -137,11 +138,39 @@ const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: numb
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
 
+        asteroids.forEach((asteroidData, index) => {
+            [ship1Data, ship2Data].forEach((objectData) => {
+                applyCollisionSpeedChange(asteroidData, objectData);
+                objectData.positionX = collisionFixX(asteroidData, objectData);
+                objectData.positionY = collisionFixY(asteroidData, objectData);
+                asteroidData.positionX = collisionFixX(objectData, asteroidData);
+                asteroidData.positionY = collisionFixY(objectData, asteroidData);
+            });
+            asteroids.forEach((nestedAsteroidData, nestAsteroidIndex) => {
+                if (nestAsteroidIndex === index) {
+                    return;
+                }
+                applyCollisionSpeedChange(asteroidData, nestedAsteroidData);
+                nestedAsteroidData.positionX = collisionFixX(asteroidData, nestedAsteroidData);
+                nestedAsteroidData.positionY = collisionFixY(asteroidData, nestedAsteroidData);
+                asteroidData.positionX = collisionFixX(nestedAsteroidData, asteroidData);
+                asteroidData.positionY = collisionFixY(nestedAsteroidData, asteroidData);
+            });
+            asteroidData.positionX = asteroidData.positionX + asteroidData.speedX;
+            asteroidData.positionY = asteroidData.positionY + asteroidData.speedY;
+            planets.forEach(planetData => {
+                asteroidData.speedX = asteroidData.speedX + gravityAccelerationX(planetData, asteroidData);
+                asteroidData.speedY = asteroidData.speedY + gravityAccelerationY(planetData, asteroidData);
+                asteroidData.speedX = resistanceAdjustmentX(planetData, asteroidData);
+                asteroidData.speedY = resistanceAdjustmentY(planetData, asteroidData);
+            });
+        });
+
         applyCollisionSpeedChange(ship1Data, ship2Data);
         ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
         ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
-        // ship1Data.positionX = collisionFixX(ship2Data, ship1Data);
-        // ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
+        ship1Data.positionX = collisionFixX(ship2Data, ship1Data);
+        ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
         [ship1Data, ship2Data].forEach(shipData => {
             shipData.positionX = shipData.positionX + shipData.speedX;
             shipData.positionY = shipData.positionY + shipData.speedY;
@@ -183,8 +212,8 @@ const updateShipData = () => {
             }
         })
     }
-
 }
+
 let t = setInterval(updateShipData, frameMilliseconds);
 
 

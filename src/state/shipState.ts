@@ -103,7 +103,7 @@ export const setShipData = (stage: Stage) => {
     ship2Data.speedX = 0.45;
     ship2Data.speedY = 0.001;
     ship2Data.angleRadians = 0;
-  } else if (stage === "freefall") {
+  } else if (stage === "freefall" || stage === "pinball") {
     ship1Data.positionX = 550;
     ship1Data.positionY = 100;
     ship1Data.speedX = 0.001;
