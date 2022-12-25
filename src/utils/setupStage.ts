@@ -10,6 +10,9 @@ const randomStages: Array<Stage> = [
   "milkyWay",
   "maw",
   "kongoFalls",
+  "freefall",
+  "junkyard",
+  "pinball",
 ];
 
 export const setupStage = (stage: Stage | "random") => {
