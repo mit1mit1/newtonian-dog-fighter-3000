@@ -5,7 +5,7 @@ import { baseShipRadius, maxHealth } from "@/constants/ships";
 import { ship1Data, ship2Data } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
 import { distanceSquared } from "@/utils/math";
-import { collisionFixX, collisionFixY, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "@/utils/physics";
+import { applyCollisionSpeedChange, applyCollisionPositionFix, gravityAccelerationX, gravityAccelerationY, resistanceAdjustmentX, resistanceAdjustmentY } from "@/utils/physics";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
 import { frameMilliseconds } from "@/constants/physics";
@@ -120,41 +120,20 @@ const getOutOfMapDamage = (shipData: { positionX: number, positionY: number }) =
     return 0;
 }
 
-const applyCollisionSpeedChange = (firstShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }, secondShipData: { speedX: number, speedY: number, positionX: number, positionY: number, radius: number }) => {
-    if (distanceSquared(firstShipData.positionX, secondShipData.positionX, firstShipData.positionY, secondShipData.positionY) > (firstShipData.radius + secondShipData.radius) ** 2) {
-        return;
-    }
-    const firstSpeedX = firstShipData.speedX;
-    const secondSpeedX = secondShipData.speedX;
-    const firstSpeedY = firstShipData.speedY;
-    const secondSpeedY = secondShipData.speedY;
-    firstShipData.speedX = 0.2 * firstSpeedX + 0.85 * secondSpeedX
-    firstShipData.speedY = 0.2 * firstSpeedY + 0.85 * secondSpeedY
-    secondShipData.speedX = 0.2 * secondSpeedX + 0.85 * firstSpeedX
-    secondShipData.speedY = 0.2 * secondSpeedY + 0.85 * firstSpeedY
-}
-
-
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
 
         asteroids.forEach((asteroidData, index) => {
             [ship1Data, ship2Data].forEach((objectData) => {
                 applyCollisionSpeedChange(asteroidData, objectData);
-                objectData.positionX = collisionFixX(asteroidData, objectData);
-                objectData.positionY = collisionFixY(asteroidData, objectData);
-                asteroidData.positionX = collisionFixX(objectData, asteroidData);
-                asteroidData.positionY = collisionFixY(objectData, asteroidData);
+                applyCollisionPositionFix(asteroidData, objectData);
             });
             asteroids.forEach((nestedAsteroidData, nestAsteroidIndex) => {
                 if (nestAsteroidIndex === index) {
                     return;
                 }
                 applyCollisionSpeedChange(asteroidData, nestedAsteroidData);
-                nestedAsteroidData.positionX = collisionFixX(asteroidData, nestedAsteroidData);
-                nestedAsteroidData.positionY = collisionFixY(asteroidData, nestedAsteroidData);
-                asteroidData.positionX = collisionFixX(nestedAsteroidData, asteroidData);
-                asteroidData.positionY = collisionFixY(nestedAsteroidData, asteroidData);
+                applyCollisionPositionFix(asteroidData, nestedAsteroidData);
             });
             asteroidData.positionX = asteroidData.positionX + asteroidData.speedX;
             asteroidData.positionY = asteroidData.positionY + asteroidData.speedY;
@@ -167,10 +146,7 @@ const updateShipData = () => {
         });
 
         applyCollisionSpeedChange(ship1Data, ship2Data);
-        ship2Data.positionX = collisionFixX(ship1Data, ship2Data);
-        ship2Data.positionY = collisionFixY(ship1Data, ship2Data);
-        ship1Data.positionX = collisionFixX(ship2Data, ship1Data);
-        ship1Data.positionY = collisionFixY(ship2Data, ship1Data);
+        applyCollisionPositionFix(ship1Data, ship2Data);
         [ship1Data, ship2Data].forEach(shipData => {
             shipData.positionX = shipData.positionX + shipData.speedX;
             shipData.positionY = shipData.positionY + shipData.speedY;
@@ -210,7 +186,7 @@ const updateShipData = () => {
                     hasSetIsRestarting = false
                 }, 3000)
             }
-        })
+        });
     }
 }
 

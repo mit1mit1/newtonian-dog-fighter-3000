@@ -1,5 +1,6 @@
 // store.js
-import { baseShipRadius, maxHealth } from "@/constants/ships";
+import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
+import { baseShipMass, baseShipRadius, maxHealth } from "@/constants/ships";
 import type { MoveableSphereData, Stage } from "@/types";
 import { reactive } from "vue";
 
@@ -32,6 +33,7 @@ const initialShip1Data: ShipData = {
   rearEngineThrust: 1,
   sideEngineThrust: 1,
   moveLag: false,
+  mass: baseShipMass,
 };
 
 export const ship1Data = reactive(initialShip1Data);
@@ -52,6 +54,7 @@ const initialShip2Data: ShipData = {
   rearEngineThrust: 1,
   sideEngineThrust: 1,
   moveLag: false,
+  mass: baseShipMass,
 };
 
 export const ship2Data = reactive(initialShip2Data);
@@ -80,52 +83,52 @@ export const setShipData = (stage: Stage) => {
   ship2Data.angularMomentum = 0;
 
   if (stage === "maw") {
-    ship1Data.positionX = 550;
-    ship1Data.positionY = 100;
+    ship1Data.positionX = viewboxWidth * 0.5;
+    ship1Data.positionY = viewboxHeight * 0.5 - 170;
     ship1Data.speedX = 0.45;
-    ship1Data.speedY = 0.001;
+    ship1Data.speedY = 0;
     ship1Data.angleRadians = 0;
 
-    ship2Data.positionX = 550;
-    ship2Data.positionY = 440;
+    ship2Data.positionX = viewboxWidth * 0.5;
+    ship2Data.positionY = viewboxHeight * 0.5 + 170;
     ship2Data.speedX = -0.45;
-    ship2Data.speedY = -0.001;
+    ship2Data.speedY = 0;
     ship2Data.angleRadians = Math.PI;
   } else if (stage === "kongoFalls") {
-    ship1Data.positionX = 550;
-    ship1Data.positionY = 100;
+    ship1Data.positionX = viewboxWidth * 0.5;
+    ship1Data.positionY = viewboxHeight * 0.5 - 170;
     ship1Data.speedX = 0.45;
-    ship1Data.speedY = 0.001;
+    ship1Data.speedY = 0;
     ship1Data.angleRadians = 0;
 
-    ship2Data.positionX = 550;
-    ship2Data.positionY = 440;
+    ship2Data.positionX = viewboxWidth * 0.5;
+    ship2Data.positionY = viewboxHeight * 0.5 + 170;
     ship2Data.speedX = 0.45;
-    ship2Data.speedY = 0.001;
+    ship2Data.speedY = 0;
     ship2Data.angleRadians = 0;
   } else if (stage === "freefall" || stage === "pinball") {
-    ship1Data.positionX = 550;
-    ship1Data.positionY = 100;
-    ship1Data.speedX = 0.001;
-    ship1Data.speedY = 0.001;
+    ship1Data.positionX = viewboxWidth * 0.5;
+    ship1Data.positionY = viewboxHeight * 0.5 - 170;
+    ship1Data.speedX = 0;
+    ship1Data.speedY = 0;
     ship1Data.angleRadians = 0;
 
-    ship2Data.positionX = 550;
-    ship2Data.positionY = 440;
-    ship2Data.speedX = 0.001;
-    ship2Data.speedY = 0.001;
+    ship2Data.positionX = viewboxWidth * 0.5;
+    ship2Data.positionY = viewboxHeight * 0.5 + 170;
+    ship2Data.speedX = 0;
+    ship2Data.speedY = 0;
     ship2Data.angleRadians = Math.PI;
   } else {
-    ship1Data.positionX = 550;
-    ship1Data.positionY = 100;
+    ship1Data.positionX = viewboxWidth * 0.5;
+    ship1Data.positionY = viewboxHeight * 0.5 - 170;
     ship1Data.speedX = 0.4;
-    ship1Data.speedY = 0.001;
+    ship1Data.speedY = 0;
     ship1Data.angleRadians = 0;
 
-    ship2Data.positionX = 550;
-    ship2Data.positionY = 440;
+    ship2Data.positionX = viewboxWidth * 0.5;
+    ship2Data.positionY = viewboxHeight * 0.5 + 170;
     ship2Data.speedX = -0.4;
-    ship2Data.speedY = -0.001;
+    ship2Data.speedY = 0;
     ship2Data.angleRadians = Math.PI;
   }
 };

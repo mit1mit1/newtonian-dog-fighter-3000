@@ -2,6 +2,7 @@ import type { MoveableSphereData } from "@/types";
 import {
   directionMultiplier,
   distanceSquared,
+  isOverlapping,
   xComponent,
   yComponent,
 } from "./math";
@@ -218,6 +219,19 @@ export const collisionFixY = (
   );
 };
 
+export const applyCollisionPositionFix = (
+  object1: MoveableSphereData,
+  object2: MoveableSphereData
+) => {
+  return;
+  // while (isOverlapping(object1, object2)) {
+  //   object1.positionX = object1.positionX + 3 * object1.speedX;
+  //   object1.positionY = object1.positionY + 3 * object1.speedY;
+  //   object2.positionX = object2.positionX + 3 * object2.speedX;
+  //   object2.positionY = object2.positionY + 3 * object2.speedY;
+  // }
+};
+
 export const density = ({
   mass,
   radius,
@@ -249,6 +263,8 @@ export const densityColorMultiplier = (
   );
 };
 
+const collisionElasticity = 1;
+
 export const applyCollisionSpeedChange = (
   firstObjectData: MoveableSphereData,
   secondObjectData: MoveableSphereData
@@ -268,8 +284,56 @@ export const applyCollisionSpeedChange = (
   const secondSpeedX = secondObjectData.speedX;
   const firstSpeedY = firstObjectData.speedY;
   const secondSpeedY = secondObjectData.speedY;
-  firstObjectData.speedX = 0.2 * firstSpeedX + 0.85 * secondSpeedX;
-  firstObjectData.speedY = 0.2 * firstSpeedY + 0.85 * secondSpeedY;
-  secondObjectData.speedX = 0.2 * secondSpeedX + 0.85 * firstSpeedX;
-  secondObjectData.speedY = 0.2 * secondSpeedY + 0.85 * firstSpeedY;
+  if (!firstObjectData.mass) {
+    throw TypeError(`firstObjectData.mass is 0`);
+  }
+  if (!secondObjectData.mass) {
+    throw TypeError(`secondObjectData.mass is 0`);
+  }
+
+  console.log(firstObjectData.speedX, firstObjectData.speedY);
+  console.log(secondObjectData.speedX, secondObjectData.speedY);
+  firstObjectData.speedX =
+    (1 - collisionElasticity) * firstSpeedX +
+    (collisionElasticity * secondSpeedX * secondObjectData.mass) /
+      firstObjectData.mass;
+  firstObjectData.speedY =
+    (1 - collisionElasticity) * firstSpeedY +
+    (collisionElasticity * secondSpeedY * secondObjectData.mass) /
+      firstObjectData.mass;
+  secondObjectData.speedX =
+    (1 - collisionElasticity) * secondSpeedX +
+    (collisionElasticity * firstSpeedX * firstObjectData.mass) /
+      secondObjectData.mass;
+  secondObjectData.speedY =
+    (1 - collisionElasticity) * secondSpeedY +
+    (collisionElasticity * firstSpeedY * firstObjectData.mass) /
+      secondObjectData.mass;
+  if (
+    isOverlapping(
+      {
+        ...firstObjectData,
+        positionX: firstObjectData.positionX + firstObjectData.speedX,
+        positionY: firstObjectData.positionY + firstObjectData.speedY,
+      },
+      {
+        ...secondObjectData,
+        positionX: secondObjectData.positionX + secondObjectData.speedX,
+        positionY: secondObjectData.positionY + secondObjectData.speedY,
+      }
+    )
+  ) {
+    firstObjectData.positionX = firstObjectData.positionX - firstSpeedX;
+    firstObjectData.positionY = firstObjectData.positionY - firstSpeedY;
+    secondObjectData.positionX = secondObjectData.positionX - secondSpeedX;
+    secondObjectData.positionY = secondObjectData.positionY - secondSpeedY;
+    firstObjectData.positionX = firstObjectData.positionX - firstObjectData.speedX;
+    firstObjectData.positionY = firstObjectData.positionY - firstObjectData.speedY;
+    secondObjectData.positionX = secondObjectData.positionX - secondObjectData.speedX;
+    secondObjectData.positionY = secondObjectData.positionY - secondObjectData.speedY;
+    // TODO: might need to skip moving for this turn as well?
+    // applyCollisionSpeedChange(firstObjectData, secondObjectData);
+  }
+  console.log(firstObjectData.speedX, firstObjectData.speedY);
+  console.log(secondObjectData.speedX, secondObjectData.speedY);
 };

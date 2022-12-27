@@ -25,7 +25,10 @@ export const distanceSquared = (
 };
 
 export const directionMultiplier = (x1: number, x2: number) => {
-  return (x2 - x1) / Math.abs(x1 - x2);
+  if (x1 === x2) {
+    return 0;
+  }
+  return (x2 - x1) / Math.abs(x1 - x2 ?? 1);
 };
 
 export const xComponent = (x1: number, x2: number, y1: number, y2: number) => {

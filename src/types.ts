@@ -15,4 +15,5 @@ export type MoveableSphereData = {
   speedX: number;
   speedY: number;
   radius: number;
+  mass: number;
 };

@@ -11,13 +11,17 @@ type PlanetData = {
   damage: number;
 };
 
+const baseSunResistanceMultiplyer = 0.9997;
+const basePlanetResistanceMultiplyer = 0.9999;
+const baseBlackHoleResistanceMultiplyer = 0.999;
+
 const westBigPlanet = {
   damage: 1,
   positionX: 0.5 * viewboxWidth - 290,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
   mass: 1,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const eastBigPlanet = {
@@ -26,7 +30,7 @@ const eastBigPlanet = {
   positionY: 0.5 * viewboxHeight,
   radius: 30,
   mass: 1,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const northBigPlanet = {
@@ -35,7 +39,7 @@ const northBigPlanet = {
   positionY: 0.5 * viewboxHeight - 200,
   radius: 30,
   mass: 1,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const southBigPlanet = {
@@ -44,7 +48,7 @@ const southBigPlanet = {
   positionY: 0.5 * viewboxHeight + 200,
   radius: 30,
   mass: 1,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const gaseousSystem = {
@@ -63,7 +67,7 @@ const middleSun = {
   positionY: 0.5 * viewboxHeight,
   radius: 100,
   mass: 39,
-  resistanceMultiplier: 0.9997,
+  resistanceMultiplier: baseSunResistanceMultiplyer,
 };
 
 const farWestBlackHole = {
@@ -72,7 +76,7 @@ const farWestBlackHole = {
   positionY: 0.5 * viewboxHeight,
   radius: 20,
   mass: 100,
-  resistanceMultiplier: 0.999,
+  resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
 const middleBlackHole = {
@@ -81,7 +85,7 @@ const middleBlackHole = {
   positionY: 0.5 * viewboxHeight,
   radius: 20,
   mass: 100,
-  resistanceMultiplier: 0.999,
+  resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
 const westSun = {
@@ -90,7 +94,7 @@ const westSun = {
   positionY: 0.5 * viewboxHeight,
   radius: 80,
   mass: 33,
-  resistanceMultiplier: 0.9997,
+  resistanceMultiplier: baseSunResistanceMultiplyer,
 };
 
 const eastSun = {
@@ -99,7 +103,7 @@ const eastSun = {
   positionY: 0.5 * viewboxHeight,
   radius: 80,
   mass: 33,
-  resistanceMultiplier: 0.9997,
+  resistanceMultiplier: baseSunResistanceMultiplyer,
 };
 
 const northWestLittlePlanet = {
@@ -108,7 +112,7 @@ const northWestLittlePlanet = {
   positionY: 0.5 * viewboxHeight - 150,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const northEastLittlePlanet = {
@@ -117,7 +121,7 @@ const northEastLittlePlanet = {
   positionY: 0.5 * viewboxHeight - 150,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const southWestLittlePlanet = {
@@ -126,7 +130,7 @@ const southWestLittlePlanet = {
   positionY: 0.5 * viewboxHeight + 150,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const southEastLittlePlanet = {
@@ -135,7 +139,7 @@ const southEastLittlePlanet = {
   positionY: 0.5 * viewboxHeight + 150,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const planet3 = {
@@ -144,7 +148,7 @@ const planet3 = {
   positionY: 310,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const planet4 = {
@@ -153,7 +157,7 @@ const planet4 = {
   positionY: 230,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const planet5 = {
@@ -162,7 +166,7 @@ const planet5 = {
   positionY: 310,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 const planet6 = {
@@ -171,7 +175,7 @@ const planet6 = {
   positionY: 230,
   radius: 22,
   mass: 0.5,
-  resistanceMultiplier: 0.9999,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
 export const planets = reactive([] as Array<PlanetData>);
