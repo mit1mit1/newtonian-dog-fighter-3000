@@ -99,15 +99,19 @@ const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
 
         asteroids.forEach((asteroidData, index) => {
-            shipState.ships.forEach((objectData) => {
+            shipState.ships.forEach((objectData, shipIndex) => {
                 // TODO might need to assign differently here also would be nice to make the typing more generic
                 [asteroidData, objectData] = getCollisionResult(asteroidData, objectData) as [MoveableSphereData, ShipData] | false || [asteroidData, objectData as ShipData];
+                asteroids[index] = asteroidData;
+                shipState.ships[shipIndex] = objectData;
             });
-            asteroids.forEach((nestedAsteroidData, nestAsteroidIndex) => {
-                if (nestAsteroidIndex === index) {
+            asteroids.forEach((nestedAsteroidData, nestedAsteroidIndex) => {
+                if (nestedAsteroidIndex <= index) {
                     return;
                 }
                 [asteroidData, nestedAsteroidData] = getCollisionResult(asteroidData, nestedAsteroidData) as [MoveableSphereData, MoveableSphereData] | false || [asteroidData, nestedAsteroidData];
+                asteroids[index] = asteroidData;
+                asteroids[nestedAsteroidIndex] = nestedAsteroidData;
             });
             asteroidData.positionX = asteroidData.positionX + asteroidData.speedX;
             asteroidData.positionY = asteroidData.positionY + asteroidData.speedY;
