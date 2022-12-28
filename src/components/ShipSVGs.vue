@@ -161,11 +161,11 @@ const updateShipData = () => {
                 setTimeout(() => {
                     isRestarting = true
                 }, 1000)
-                setTimeout(() => setupStage("random"), 3000)
                 setTimeout(() => {
                     isRestarting = false
                     hasSetIsRestarting = false
-                }, 3000)
+                    setupStage("random")
+                }, 1600)
             }
         });
     }
@@ -177,9 +177,10 @@ let t = setInterval(updateShipData, frameMilliseconds);
 export default defineComponent({
     data() {
         return {
-            shipState, pi: Math.PI, maxHealth
+            shipState, pi: Math.PI, maxHealth,
         }
     },
+
 });
 </script>
 
