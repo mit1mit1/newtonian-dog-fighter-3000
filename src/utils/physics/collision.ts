@@ -2,7 +2,7 @@ import type { MoveableSphereData } from "@/types";
 import { distanceSquared, isOverlapping } from "../math";
 import type { ShipData } from "@/state/shipState";
 
-const collisionElasticity = 1;
+const collisionElasticity = 0.9;
 
 export const getCollisionResult = (
   firstObjectData: MoveableSphereData | ShipData,

@@ -26,6 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - run: yarn install
+    - run: yarn test:unit:coverage
     - run: yarn build
     # - run: yarn test:unit:coverage
 
