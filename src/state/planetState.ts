@@ -182,7 +182,7 @@ const planet6 = {
 export const planets = reactive([] as Array<PlanetData>);
 
 export const setPlanetData = (stage: Stage) => {
-  planets.length = 0;
+  planets.splice(0, planets.length);
   if (stage === "battlefield") {
     planets.push(middleSun);
     planets.push(westBigPlanet);

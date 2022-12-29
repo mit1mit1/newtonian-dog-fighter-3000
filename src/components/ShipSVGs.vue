@@ -1,16 +1,16 @@
 <script lang="ts">
 import { blastZoneCenterX, blastZoneCenterY, blastZoneRadiusX, blastZoneRadiusY } from "@/constants/mapNumbers.js";
 import { planets } from "@/state/planetState";
-import { baseShipRadius, maxHealth } from "@/constants/ships";
+import { maxHealth, maxFuel } from "@/constants/ships";
 import { shipState, type ShipData } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
 import { distanceSquared } from "@/utils/math";
 import { getCollisionResult, gravityAccelerationX, gravityAccelerationY, resistanceAdjustedXSpeed, resistanceAdjustedYSpeed } from "@/utils/physics";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
-import { frameMilliseconds } from "@/constants/physics";
+import { frameMilliseconds, frameSpeedMultiplier } from "@/constants/physics";
 import { asteroids } from "@/state/asteroidState";
-import type { MoveableSphereData, NumberOfPlayers } from "@/types";
+import type { MoveableSphereData } from "@/types";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -55,6 +55,7 @@ const handleKeydown = (e: KeyboardEvent) => {
     }
 }
 
+// console.time('perf')
 const handleKeyup = (e: KeyboardEvent) => {
     if (e.key === "d") {
         shipState.ships[0].leftEngineOn = false;
@@ -113,11 +114,11 @@ const updateShipData = () => {
                 asteroids[index] = asteroidData;
                 asteroids[nestedAsteroidIndex] = nestedAsteroidData;
             });
-            asteroidData.positionX = asteroidData.positionX + asteroidData.speedX;
-            asteroidData.positionY = asteroidData.positionY + asteroidData.speedY;
+            asteroidData.positionX = asteroidData.positionX + frameSpeedMultiplier * asteroidData.speedX;
+            asteroidData.positionY = asteroidData.positionY + frameSpeedMultiplier * asteroidData.speedY;
             planets.forEach(planetData => {
-                asteroidData.speedX = asteroidData.speedX + gravityAccelerationX(planetData, asteroidData);
-                asteroidData.speedY = asteroidData.speedY + gravityAccelerationY(planetData, asteroidData);
+                asteroidData.speedX = asteroidData.speedX + frameSpeedMultiplier * gravityAccelerationX(planetData, asteroidData);
+                asteroidData.speedY = asteroidData.speedY + frameSpeedMultiplier * gravityAccelerationY(planetData, asteroidData);
                 asteroidData.speedX = resistanceAdjustedXSpeed(planetData, asteroidData);
                 asteroidData.speedY = resistanceAdjustedYSpeed(planetData, asteroidData);
             });
@@ -131,33 +132,41 @@ const updateShipData = () => {
         }
 
         shipState.ships.forEach(shipData => {
-            shipData.positionX = shipData.positionX + shipData.speedX;
-            shipData.positionY = shipData.positionY + shipData.speedY;
-            shipData.health = shipData.health - getOutOfMapDamage(shipData);
+            shipData.positionX = shipData.positionX + frameSpeedMultiplier * shipData.speedX;
+            shipData.positionY = shipData.positionY + frameSpeedMultiplier * shipData.speedY;
+            shipData.health = shipData.health - frameSpeedMultiplier * getOutOfMapDamage(shipData);
             planets.forEach(planetData => {
-                shipData.health = shipData.health - getPlanetDamage(shipData, planetData);
-                shipData.speedX = shipData.speedX + gravityAccelerationX(planetData, shipData);
-                shipData.speedY = shipData.speedY + gravityAccelerationY(planetData, shipData);
+                shipData.health = shipData.health - frameSpeedMultiplier * getPlanetDamage(shipData, planetData);
+                shipData.speedX = shipData.speedX + frameSpeedMultiplier * gravityAccelerationX(planetData, shipData);
+                shipData.speedY = shipData.speedY + frameSpeedMultiplier * gravityAccelerationY(planetData, shipData);
                 shipData.speedX = resistanceAdjustedXSpeed(planetData, shipData);
                 shipData.speedY = resistanceAdjustedYSpeed(planetData, shipData);
             });
 
             shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
-            shipData.angularMomentum *= 0.985
-            if (shipData.leftEngineOn) {
-                shipData.angularMomentum += shipData.sideEngineThrust
+            shipData.angularMomentum *= 0.985 ** 4
+            if (shipData.leftEngineOn && shipData.fuel > 0) {
+                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+                shipData.angularMomentum += frameSpeedMultiplier * shipData.sideEngineThrust
             }
-            if (shipData.rightEngineOn) {
-                shipData.angularMomentum -= shipData.sideEngineThrust
+            if (shipData.rightEngineOn && shipData.fuel > 0) {
+                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+                shipData.angularMomentum -= frameSpeedMultiplier * shipData.sideEngineThrust
             }
-            if (shipData.rearEngineOn) {
-                shipData.speedX = shipData.speedX + shipData.rearEngineThrust * Math.cos(shipData.angleRadians);
-                shipData.speedY = shipData.speedY + shipData.rearEngineThrust * Math.sin(shipData.angleRadians);
+            if (shipData.rearEngineOn && shipData.fuel > 0) {
+                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 5;
+                shipData.speedX = shipData.speedX + frameSpeedMultiplier * shipData.rearEngineThrust * Math.cos(shipData.angleRadians);
+                shipData.speedY = shipData.speedY + frameSpeedMultiplier * shipData.rearEngineThrust * Math.sin(shipData.angleRadians);
             }
-            if (shipData.afterburnerOn) {
-                shipData.speedX = shipData.speedX + shipData.rearEngineThrust * 2.5 * Math.cos(shipData.angleRadians);
-                shipData.speedY = shipData.speedY + shipData.rearEngineThrust * 2.5 * Math.sin(shipData.angleRadians);
+            if (shipData.afterburnerOn && shipData.fuel > 0) {
+                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 18;
+                shipData.speedX = shipData.speedX + frameSpeedMultiplier * shipData.rearEngineThrust * 2.5 * Math.cos(shipData.angleRadians);
+                shipData.speedY = shipData.speedY + frameSpeedMultiplier * shipData.rearEngineThrust * 2.5 * Math.sin(shipData.angleRadians);
             }
+            if (shipData.fuel < maxFuel) {
+                shipData.fuel = shipData.fuel + frameSpeedMultiplier;
+            }
+            // TODO - calculate the changed state, then push it at predictable times?
             if (shipData.health <= 0 && isRestarting === false && hasSetIsRestarting === false) {
                 hasSetIsRestarting = true;
                 setTimeout(() => {
@@ -170,6 +179,7 @@ const updateShipData = () => {
                 }, 1600)
             }
         });
+        // console.timeLog('perf')
     }
 }
 
@@ -179,7 +189,7 @@ let t = setInterval(updateShipData, frameMilliseconds);
 export default defineComponent({
     data() {
         return {
-            shipState, pi: Math.PI, maxHealth,
+            shipState, pi: Math.PI, maxHealth, maxFuel,
         }
     },
 
@@ -201,17 +211,22 @@ export default defineComponent({
         :width="200 * shipState.ships[0].health / maxHealth" height="20" rx="5" fill="url(#grad1)" />
     <rect v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0" class="healthBar" x="800" y="500"
         :width="200 * shipState.ships[1].health / maxHealth" height="20" rx="5" fill="url(#grad2)" />
+
+    <rect v-if="shipState.ships.length > 0 && shipState.ships[0].fuel >= 0" class="fuelBar" x="50" y="550"
+        :width="200 * shipState.ships[0].fuel / maxFuel" height="10" rx="5" fill="url(#grad2)" />
+    <rect v-if="shipState.ships.length > 1 && shipState.ships[1].fuel >= 0" class="fuelBar" x="800" y="550"
+        :width="200 * shipState.ships[1].fuel / maxFuel" height="10" rx="5" fill="url(#grad1)" />
     <g v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0">
         <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
             :r="shipState.ships[0].radius"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad1)" />
-        <circle v-if="shipState.ships[0].rearEngineOn" class="ship1Burner"
+        <circle v-if="shipState.ships[0].rearEngineOn && shipState.ships[0].fuel > 0" class="ship1Burner"
             :cx="shipState.ships[0].positionX - 2 * shipState.ships[0].radius / 3" :cy="shipState.ships[0].positionY"
             :r="shipState.ships[0].radius / 2"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad2)" />
-        <circle v-if="shipState.ships[0].afterburnerOn" class="ship1Afterburner"
+        <circle v-if="shipState.ships[0].afterburnerOn && shipState.ships[0].fuel > 0" class="ship1Afterburner"
             :cx="shipState.ships[0].positionX - 2 * shipState.ships[0].radius / 3" :cy="shipState.ships[0].positionY"
             :r="2 * shipState.ships[0].radius / 3"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
@@ -225,12 +240,12 @@ export default defineComponent({
             :r="shipState.ships[1].radius"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad2)" />
-        <circle v-if="shipState.ships[1].rearEngineOn" class="ship2Burner"
+        <circle v-if="shipState.ships[1].rearEngineOn && shipState.ships[1].fuel > 0" class="ship2Burner"
             :cx="shipState.ships[1].positionX - 2 * shipState.ships[1].radius / 3" :cy="shipState.ships[1].positionY"
             :r="shipState.ships[1].radius / 2"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad1)" />
-        <circle v-if="shipState.ships[1].afterburnerOn" class="ship2Afterburner"
+        <circle v-if="shipState.ships[1].afterburnerOn && shipState.ships[1].fuel > 0" class="ship2Afterburner"
             :cx="shipState.ships[1].positionX - 2 * shipState.ships[1].radius / 3" :cy="shipState.ships[1].positionY"
             :r="2 * shipState.ships[1].radius / 3"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"

@@ -1,7 +1,12 @@
 // store.js
 import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
 import { frameMilliseconds } from "@/constants/physics";
-import { baseShipMass, baseShipRadius, maxHealth } from "@/constants/ships";
+import {
+  baseShipMass,
+  baseShipRadius,
+  maxFuel,
+  maxHealth,
+} from "@/constants/ships";
 import type { MoveableSphereData, NumberOfPlayers, Stage } from "@/types";
 import { reactive } from "vue";
 
@@ -16,6 +21,7 @@ export type ShipData = MoveableSphereData & {
   rearEngineThrust: number;
   sideEngineThrust: number;
   moveLag: boolean;
+  fuel: number;
 };
 
 export const shipState = reactive({
@@ -28,8 +34,8 @@ export const shipState = reactive({
     ) {
       this.ships[playerId].radius += 5;
       this.ships[playerId].moveLag = true;
-      setTimeout(() => this.unEnlargen(playerId), frameMilliseconds * 60);
-      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 110);
+      setTimeout(() => this.unEnlargen(playerId), frameMilliseconds * 15);
+      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 30);
     }
   },
   unEnlargen(playerId: 0 | 1) {
@@ -45,9 +51,9 @@ export const shipState = reactive({
       this.ships[playerId].moveLag = true;
       setTimeout(
         () => this.unHide(playerId, originalRadius),
-        frameMilliseconds * 100
+        frameMilliseconds * 25
       );
-      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 150);
+      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 40);
     }
   },
   unHide(playerId: 0 | 1, originalRadius: number) {
@@ -62,9 +68,9 @@ export const shipState = reactive({
       this.ships[playerId].moveLag = true;
       setTimeout(
         () => this.unFireAfterburner(playerId),
-        frameMilliseconds * 200
+        frameMilliseconds * 50
       );
-      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 450);
+      setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 120);
     }
   },
   unFireAfterburner(playerId: 0 | 1) {
@@ -92,6 +98,7 @@ const initialShip1Data: ShipData = {
   sideEngineThrust: 1,
   moveLag: false,
   mass: baseShipMass,
+  fuel: maxFuel,
 };
 
 const initialShip2Data: ShipData = {
@@ -111,10 +118,12 @@ const initialShip2Data: ShipData = {
   sideEngineThrust: 1,
   moveLag: false,
   mass: baseShipMass,
+  fuel: maxFuel,
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   shipState.ships.length = 0;
+  shipState.ships.splice(0, shipState.ships.length);
   shipState.numberOfPlayers = numberOfPlayers;
   if (numberOfPlayers === 0) {
     return;
@@ -130,6 +139,7 @@ export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   ship1Data.moveLag = false;
   ship1Data.radius = baseShipRadius;
   ship1Data.angularMomentum = 0;
+  ship1Data.fuel = maxFuel;
 
   const ship2Data = { ...initialShip2Data };
   ship2Data.rearEngineOn = false;
@@ -142,6 +152,7 @@ export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   ship2Data.moveLag = false;
   ship2Data.radius = baseShipRadius;
   ship2Data.angularMomentum = 0;
+  ship2Data.fuel = maxFuel;
 
   if (stage === "maw") {
     ship1Data.positionX = viewboxWidth * 0.5;

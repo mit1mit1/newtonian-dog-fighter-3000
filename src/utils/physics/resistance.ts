@@ -1,3 +1,4 @@
+import { frameSpeedMultiplier } from "@/constants/physics";
 import { isOverlapping } from "../math";
 
 export const emptySpaceResistanceMultiplier = 0.999995;
@@ -18,9 +19,13 @@ export const resistanceAdjustedXSpeed = (
   }
 ) => {
   if (isOverlapping(planetData, shipData)) {
-    return shipData.speedX * planetData.resistanceMultiplier;
+    return (
+      shipData.speedX * planetData.resistanceMultiplier ** frameSpeedMultiplier
+    );
   }
-  return shipData.speedX * emptySpaceResistanceMultiplier;
+  return (
+    shipData.speedX * emptySpaceResistanceMultiplier ** frameSpeedMultiplier
+  );
 };
 export const resistanceAdjustedYSpeed = (
   planetData: {

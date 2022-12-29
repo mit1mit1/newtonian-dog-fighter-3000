@@ -1,6 +1,7 @@
 import type { MoveableSphereData } from "@/types";
 import { distanceSquared, isOverlapping } from "../math";
 import type { ShipData } from "@/state/shipState";
+import { frameSpeedMultiplier } from "@/constants/physics";
 
 const collisionElasticity = 0.9;
 
@@ -46,25 +47,41 @@ export const getCollisionResult = (
     isOverlapping(
       {
         ...firstObjectData,
-        positionX: firstObjectData.positionX + firstObjectData.speedX,
-        positionY: firstObjectData.positionY + firstObjectData.speedY,
+        positionX:
+          firstObjectData.positionX +
+          frameSpeedMultiplier * firstObjectData.speedX,
+        positionY:
+          firstObjectData.positionY +
+          frameSpeedMultiplier * firstObjectData.speedY,
       },
       {
         ...secondObjectData,
-        positionX: secondObjectData.positionX + secondObjectData.speedX,
-        positionY: secondObjectData.positionY + secondObjectData.speedY,
+        positionX:
+          secondObjectData.positionX +
+          frameSpeedMultiplier * secondObjectData.speedX,
+        positionY:
+          secondObjectData.positionY +
+          frameSpeedMultiplier * secondObjectData.speedY,
       }
     )
   ) {
-    firstResult.positionX = firstObjectData.positionX - firstSpeedX;
-    firstResult.positionY = firstObjectData.positionY - firstSpeedY;
-    secondResult.positionX = secondObjectData.positionX - secondSpeedX;
-    secondResult.positionY = secondObjectData.positionY - secondSpeedY;
-    firstResult.positionX = firstResult.positionX - firstResult.speedX;
-    firstResult.positionY = firstResult.positionY - firstResult.speedY;
+    firstResult.positionX =
+      firstObjectData.positionX - frameSpeedMultiplier * firstSpeedX;
+    firstResult.positionY =
+      firstObjectData.positionY - frameSpeedMultiplier * firstSpeedY;
+    secondResult.positionX =
+      secondObjectData.positionX - frameSpeedMultiplier * secondSpeedX;
+    secondResult.positionY =
+      secondObjectData.positionY - frameSpeedMultiplier * secondSpeedY;
+    firstResult.positionX =
+      firstResult.positionX - frameSpeedMultiplier * firstResult.speedX;
+    firstResult.positionY =
+      firstResult.positionY - frameSpeedMultiplier * firstResult.speedY;
 
-    secondResult.positionX = secondResult.positionX - secondResult.speedX;
-    secondResult.positionY = secondResult.positionY - secondResult.speedY;
+    secondResult.positionX =
+      secondResult.positionX - frameSpeedMultiplier * secondResult.speedX;
+    secondResult.positionY =
+      secondResult.positionY - frameSpeedMultiplier * secondResult.speedY;
     // TODO: might need to skip moving for this turn as well?
     // applyCollisionSpeedChange(firstObjectData, secondObjectData);
   }

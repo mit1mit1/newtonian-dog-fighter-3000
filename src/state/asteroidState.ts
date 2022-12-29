@@ -7,7 +7,7 @@ import { baseSunRadius } from "./planetState";
 export const asteroids = reactive([] as Array<MoveableSphereData>);
 
 export const setAsteroidData = (stage: Stage) => {
-  asteroids.length = 0;
+  asteroids.splice(0, asteroids.length);
   if (stage === "junkyard") {
     asteroids.push({
       mass: baseShipMass,
