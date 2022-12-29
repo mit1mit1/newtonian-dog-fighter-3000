@@ -1,7 +1,7 @@
 import { setPlanetData } from "@/state/planetState";
 import { setShipData } from "@/state/shipState";
 import { setAsteroidData } from "@/state/asteroidState";
-import type { Stage } from "@/types";
+import type { NumberOfPlayers, Stage } from "@/types";
 
 const randomStages: Array<Stage> = [
   "battlefield",
@@ -15,12 +15,15 @@ const randomStages: Array<Stage> = [
   "pinball",
 ];
 
-export const setupStage = (stage: Stage | "random") => {
+export const setupStage = (
+  stage: Stage | "random",
+  numberOfPlayers: NumberOfPlayers
+) => {
   if (stage === "random") {
     const random = Math.random();
     stage = randomStages[Math.floor(random * randomStages.length)];
   }
-  setShipData(stage);
+  setShipData(stage, numberOfPlayers);
   setPlanetData(stage);
   setAsteroidData(stage);
 };

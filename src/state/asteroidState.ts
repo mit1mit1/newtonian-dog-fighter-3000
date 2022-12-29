@@ -2,6 +2,7 @@ import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
 import { baseShipMass } from "@/constants/ships";
 import type { MoveableSphereData, Stage } from "@/types";
 import { reactive } from "vue";
+import { baseSunRadius } from "./planetState";
 
 export const asteroids = reactive([] as Array<MoveableSphereData>);
 
@@ -13,7 +14,7 @@ export const setAsteroidData = (stage: Stage) => {
       positionX: viewboxWidth / 2,
       positionY: viewboxHeight / 2 + 200,
       speedX: 0.15,
-      speedY: 0.001,
+      speedY: 0,
       radius: 6,
     });
     asteroids.push({
@@ -21,14 +22,14 @@ export const setAsteroidData = (stage: Stage) => {
       positionX: viewboxWidth / 2,
       positionY: viewboxHeight / 2 - 200,
       speedX: -0.15,
-      speedY: -0.001,
+      speedY: 0,
       radius: 6,
     });
     asteroids.push({
       mass: baseShipMass,
       positionX: viewboxWidth / 2 + 300,
       positionY: viewboxHeight / 2,
-      speedX: -0.001,
+      speedX: 0,
       speedY: -0.3,
       radius: 6,
     });
@@ -36,7 +37,7 @@ export const setAsteroidData = (stage: Stage) => {
       mass: baseShipMass,
       positionX: viewboxWidth / 2 - 300,
       positionY: viewboxHeight / 2,
-      speedX: 0.001,
+      speedX: 0,
       speedY: 0.3,
       radius: 6,
     });
@@ -45,7 +46,7 @@ export const setAsteroidData = (stage: Stage) => {
       positionX: viewboxWidth / 2,
       positionY: viewboxHeight / 2 + 300,
       speedX: 0.3,
-      speedY: 0.001,
+      speedY: 0,
       radius: 6,
     });
     asteroids.push({
@@ -53,7 +54,7 @@ export const setAsteroidData = (stage: Stage) => {
       positionX: viewboxWidth / 2,
       positionY: viewboxHeight / 2 - 300,
       speedX: -0.3,
-      speedY: -0.001,
+      speedY: 0,
       radius: 6,
     });
   } else if (stage === "pinball") {
@@ -69,5 +70,38 @@ export const setAsteroidData = (stage: Stage) => {
         });
       }
     }
+  } else if (stage === "newtonsCanons") {
+    asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 - baseSunRadius - 6 - 6,
+      speedX: 0.522,
+      speedY: 0,
+      radius: 6,
+    });
+    asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2 - baseSunRadius - 6 - 6,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: -0.48,
+      radius: 6,
+    });
+    asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2  + baseSunRadius + 6 + 6,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: 0.6,
+      radius: 6,
+    });
+    asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2  + baseSunRadius + 6 + 6,
+      speedX: -0.8,
+      speedY: 0,
+      radius: 6,
+    });
   }
 };

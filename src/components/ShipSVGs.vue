@@ -10,7 +10,7 @@ import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
 import { frameMilliseconds } from "@/constants/physics";
 import { asteroids } from "@/state/asteroidState";
-import type { MoveableSphereData } from "@/types";
+import type { MoveableSphereData, NumberOfPlayers } from "@/types";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -124,9 +124,11 @@ const updateShipData = () => {
         });
 
         // TODO: move ship data into array, correctly push to it at end of calculation with the rest
-        const [ship1Result, ship2Result] = getCollisionResult(shipState.ships[0], shipState.ships[1]) as [ShipData, ShipData] | false || shipState.ships;
-        shipState.ships[0] = ship1Result;
-        shipState.ships[1] = ship2Result;
+        if (shipState.ships.length > 1) {
+            const [ship1Result, ship2Result] = getCollisionResult(shipState.ships[0], shipState.ships[1]) as [ShipData, ShipData] | false || shipState.ships;
+            shipState.ships[0] = ship1Result;
+            shipState.ships[1] = ship2Result;
+        }
 
         shipState.ships.forEach(shipData => {
             shipData.positionX = shipData.positionX + shipData.speedX;
@@ -164,7 +166,7 @@ const updateShipData = () => {
                 setTimeout(() => {
                     isRestarting = false
                     hasSetIsRestarting = false
-                    setupStage("random")
+                    setupStage("random", shipState.numberOfPlayers)
                 }, 1600)
             }
         });
@@ -195,11 +197,11 @@ export default defineComponent({
             <stop offset="100%" style="stop-color:rgb(0,255,255);stop-opacity:1" />
         </linearGradient>
     </defs>
-    <rect v-if="shipState.ships[0].health >= 0" class="healthBar" x="50" y="500"
+    <rect v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0" class="healthBar" x="50" y="500"
         :width="200 * shipState.ships[0].health / maxHealth" height="20" rx="5" fill="url(#grad1)" />
-    <rect v-if="shipState.ships[1].health >= 0" class="healthBar" x="800" y="500"
+    <rect v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0" class="healthBar" x="800" y="500"
         :width="200 * shipState.ships[1].health / maxHealth" height="20" rx="5" fill="url(#grad2)" />
-    <g v-if="shipState.ships[0].health >= 0">
+    <g v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0">
         <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
             :r="shipState.ships[0].radius"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
@@ -215,10 +217,10 @@ export default defineComponent({
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad2)" />
     </g>
-    <text v-else x="80" y="500" font-family="monospace" stroke="url(#grad1)">
+    <text v-else-if="shipState.ships.length > 0" x="80" y="500" font-family="monospace" stroke="url(#grad1)">
         Destroyed
     </text>
-    <g v-if="shipState.ships[1].health >= 0">
+    <g v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0">
         <circle class="ship2" :cx="shipState.ships[1].positionX" :cy="shipState.ships[1].positionY"
             :r="shipState.ships[1].radius"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
@@ -234,7 +236,7 @@ export default defineComponent({
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad1)" />
     </g>
-    <text v-else x="830" y="500" font-family="monospace" stroke="url(#grad2)">
+    <text v-else-if="shipState.ships.length > 1" x="830" y="500" font-family="monospace" stroke="url(#grad2)">
         Destroyed
     </text>
 </template>

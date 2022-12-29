@@ -2,7 +2,7 @@
 import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
 import { frameMilliseconds } from "@/constants/physics";
 import { baseShipMass, baseShipRadius, maxHealth } from "@/constants/ships";
-import type { MoveableSphereData, Stage } from "@/types";
+import type { MoveableSphereData, NumberOfPlayers, Stage } from "@/types";
 import { reactive } from "vue";
 
 export type ShipData = MoveableSphereData & {
@@ -20,6 +20,7 @@ export type ShipData = MoveableSphereData & {
 
 export const shipState = reactive({
   ships: [] as Array<ShipData>,
+  numberOfPlayers: 2 as NumberOfPlayers,
   enlargen(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
@@ -112,8 +113,12 @@ const initialShip2Data: ShipData = {
   mass: baseShipMass,
 };
 
-export const setShipData = (stage: Stage) => {
+export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   shipState.ships.length = 0;
+  shipState.numberOfPlayers = numberOfPlayers;
+  if (numberOfPlayers === 0) {
+    return;
+  }
   const ship1Data = { ...initialShip1Data };
   ship1Data.rearEngineOn = false;
   ship1Data.leftEngineOn = false;
@@ -188,6 +193,10 @@ export const setShipData = (stage: Stage) => {
     ship2Data.angleRadians = Math.PI;
   }
   // TODO: Move this to function on state
-  shipState.ships.push(ship1Data);
-  shipState.ships.push(ship2Data);
+  if (numberOfPlayers >= 1) {
+    shipState.ships.push(ship1Data);
+  }
+  if (numberOfPlayers >= 2) {
+    shipState.ships.push(ship2Data);
+  }
 };

@@ -3,16 +3,17 @@ import { defineComponent } from "vue";
 import MusicControl from "@/gameMusic/MusicControl.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
-import type { Stage } from "@/types";
+import type { NumberOfPlayers, Stage } from "@/types";
 let displayModal = true;
 
 let stage: Stage | "random" = "random";
+let numberOfPlayers: NumberOfPlayers = 2;
 
 export default defineComponent({
 
     data() {
         return {
-            displayModal, stage
+            displayModal, stage, numberOfPlayers
         }
     },
 
@@ -20,7 +21,7 @@ export default defineComponent({
     methods: {
         handleFinished() {
             this.displayModal = false;
-            setupStage(this.stage)
+            setupStage(this.stage, this.numberOfPlayers)
 
             setTimeout(() => {
                 spaceState.setIsStarted(true);
@@ -28,6 +29,9 @@ export default defineComponent({
         },
         pickStage(stage: Stage | "random") {
             this.stage = stage
+        },
+        setNumberOfPlayers(numberOfPlayers: NumberOfPlayers) {
+            this.numberOfPlayers = numberOfPlayers
         }
     },
 
@@ -80,6 +84,16 @@ export default defineComponent({
                             <option value="freefall">Freefall</option>
                             <option value="junkyard">Junkyard</option>
                             <option value="pinball">Pinball</option>
+                            <option value="newtonsCanons">Newton's Cannons</option>
+                        </select>
+                    </div>
+                    <div class="control">
+                        Players:
+                        <select @input="(event: any) => setNumberOfPlayers(event.target.value)" name="numberOfPlayers"
+                            id="numberOfPlayers">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option selected value="2">2</option>
                         </select>
                     </div>
                     <MusicControl />

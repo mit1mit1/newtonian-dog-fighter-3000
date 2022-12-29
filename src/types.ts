@@ -7,7 +7,8 @@ export type Stage =
   | "kongoFalls"
   | "freefall"
   | "junkyard"
-  | "pinball";
+  | "pinball"
+  | "newtonsCanons";
 
 export type MoveableSphereData = {
   positionX: number;
@@ -17,3 +18,5 @@ export type MoveableSphereData = {
   radius: number;
   mass: number;
 };
+
+export type NumberOfPlayers = 0 | 1 | 2;

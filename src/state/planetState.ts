@@ -14,6 +14,7 @@ type PlanetData = {
 const baseSunResistanceMultiplyer = 0.9997;
 const basePlanetResistanceMultiplyer = 0.9999;
 const baseBlackHoleResistanceMultiplyer = 0.999;
+export const baseSunRadius = 100;
 
 const westBigPlanet = {
   damage: 1,
@@ -65,7 +66,7 @@ const middleSun = {
   damage: 1,
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight,
-  radius: 100,
+  radius: baseSunRadius,
   mass: 39,
   resistanceMultiplier: baseSunResistanceMultiplyer,
 };
@@ -75,7 +76,7 @@ const farWestBlackHole = {
   positionX: 0.5 * viewboxWidth - 400,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
-  mass: 100,
+  mass: baseSunRadius,
   resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
@@ -84,7 +85,7 @@ const middleBlackHole = {
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
-  mass: 100,
+  mass: baseSunRadius,
   resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
@@ -190,7 +191,7 @@ export const setPlanetData = (stage: Stage) => {
     planets.push(planet4);
     planets.push(planet5);
     planets.push(planet6);
-  } else if (stage === "finalDestination") {
+  } else if (stage === "finalDestination" || stage === "newtonsCanons") {
     planets.push(middleSun);
   } else if (stage === "pokemonStadium") {
     planets.push(westSun);
