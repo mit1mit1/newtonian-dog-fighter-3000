@@ -1,10 +1,6 @@
 # newtonian-dog-fighter-3000
 
-View the game at https://mit1mit1.github.io/newtonian-dog-fighter-3000/index.html. This project was set up with Vite - so far, it's pretty fun.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+View the game at [mit1mit1.github.io/newtonian-dog-fighter-3000](https://mit1mit1.github.io/newtonian-dog-fighter-3000). This project was set up with Vite - so far, it's pretty fun.
 
 ## Project Setup
 
