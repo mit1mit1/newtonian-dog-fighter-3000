@@ -43,7 +43,7 @@ export const resistanceAdjustedYSpeed = (
   }
 ) => {
   if (isOverlapping(planetData, shipData)) {
-    return shipData.speedY * planetData.resistanceMultiplier;
+    return shipData.speedY * planetData.resistanceMultiplier ** frameSpeedMultiplier;
   }
-  return shipData.speedY * emptySpaceResistanceMultiplier;
+  return shipData.speedY * emptySpaceResistanceMultiplier ** frameSpeedMultiplier;
 };

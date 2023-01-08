@@ -4,6 +4,7 @@ import {
   resistanceAdjustedXSpeed,
   resistanceAdjustedYSpeed,
 } from "./resistance";
+import { frameSpeedMultiplier } from "@/constants/physics";
 
 describe("resistanceAdjustedXSpeed", () => {
   it("should maintain 0 speed", () => {
@@ -28,14 +29,14 @@ describe("resistanceAdjustedXSpeed", () => {
         { radius: 0, positionX: 0, positionY: 0, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: 1, speedY: 0 }
       )
-    ).toBe(emptySpaceResistanceMultiplier);
+    ).toBe(emptySpaceResistanceMultiplier ** frameSpeedMultiplier);
 
     expect(
       resistanceAdjustedXSpeed(
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: -1, speedY: 0 }
       )
-    ).toBe(-emptySpaceResistanceMultiplier);
+    ).toBe(-(emptySpaceResistanceMultiplier ** frameSpeedMultiplier));
 
     expect(
       // TODO: should potentially be x-component reduced here?
@@ -43,7 +44,7 @@ describe("resistanceAdjustedXSpeed", () => {
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: -1, speedY: 1 }
       )
-    ).toBe(-emptySpaceResistanceMultiplier);
+    ).toBe(-(emptySpaceResistanceMultiplier ** frameSpeedMultiplier));
   });
 
   it("should reduce speed by planet speed multiplier in a planet", () => {
@@ -52,7 +53,7 @@ describe("resistanceAdjustedXSpeed", () => {
         { radius: 1, positionX: 0, positionY: 0, resistanceMultiplier: 0.5 },
         { radius: 1, positionX: 0, positionY: 0, speedX: 1, speedY: 0 }
       )
-    ).toBe(0.5);
+    ).toBe(0.5 ** frameSpeedMultiplier);
 
     expect(
       resistanceAdjustedXSpeed(
@@ -67,7 +68,7 @@ describe("resistanceAdjustedXSpeed", () => {
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: -2 },
         { radius: 1, positionX: 5, positionY: 5, speedX: -1, speedY: 1 }
       )
-    ).toBe(2);
+    ).toBe(-1 * (-2) ** frameSpeedMultiplier);
   });
 });
 
@@ -94,14 +95,14 @@ describe("resistanceAdjustedYSpeed", () => {
         { radius: 0, positionX: 0, positionY: 0, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: 0, speedY: 1 }
       )
-    ).toBe(emptySpaceResistanceMultiplier);
+    ).toBe(emptySpaceResistanceMultiplier ** frameSpeedMultiplier);
 
     expect(
       resistanceAdjustedYSpeed(
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: 0, speedY: -1 }
       )
-    ).toBe(-emptySpaceResistanceMultiplier);
+    ).toBe(-(emptySpaceResistanceMultiplier ** frameSpeedMultiplier));
 
     expect(
       // TODO: should potentially be y-component reduced here?
@@ -109,7 +110,7 @@ describe("resistanceAdjustedYSpeed", () => {
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: 0 },
         { radius: 0, positionX: 0, positionY: 0, speedX: 1, speedY: -1 }
       )
-    ).toBe(-emptySpaceResistanceMultiplier);
+    ).toBe(-(emptySpaceResistanceMultiplier ** frameSpeedMultiplier));
   });
 
   it("should reduce speed by planet speed multiplier in a planet", () => {
@@ -118,7 +119,7 @@ describe("resistanceAdjustedYSpeed", () => {
         { radius: 1, positionX: 0, positionY: 0, resistanceMultiplier: 0.5 },
         { radius: 1, positionX: 0, positionY: 0, speedX: 0, speedY: 1 }
       )
-    ).toBe(0.5);
+    ).toBe(0.5 ** frameSpeedMultiplier);
 
     expect(
       resistanceAdjustedYSpeed(
@@ -133,6 +134,6 @@ describe("resistanceAdjustedYSpeed", () => {
         { radius: 1, positionX: 5, positionY: 5, resistanceMultiplier: -2 },
         { radius: 1, positionX: 5, positionY: 5, speedX: 1, speedY: -1 }
       )
-    ).toBe(2);
+    ).toBe(-1 * (-2) ** frameSpeedMultiplier);
   });
 });

@@ -85,8 +85,8 @@ describe("getCollisionResult", () => {
       mass: 0.5,
     };
     const [result1, result2] = getCollisionResult(object1, object2) || [{}, {}];
-    expect(result1.positionX).toBe(1.25);
-    expect(result2.positionY).toBe(5.28);
+    expect(result1.positionX).toBe(1.5);
+    expect(result2.positionY).toBe(5.56);
     expect(result1.speedY).toBe(-0.42000000000000004);
     expect(result2.speedX).toBe(0.05000000000000002);
     expect(object1.positionX).toBe(1);
@@ -111,8 +111,8 @@ describe("getCollisionResult", () => {
       mass: 0,
     };
     const [result1, result2] = getCollisionResult(object1, object2) || [{}, {}];
-    expect(result1.positionX).toBe(1.25);
-    expect(result2.positionY).toBe(5.28);
+    expect(result1.positionX).toBe(1.5);
+    expect(result2.positionY).toBe(5.56);
     expect(result1.speedY).toBe(-0.42000000000000004);
     expect(result2.speedX).toBe(0.05000000000000002);
     expect(object1.positionX).toBe(1);
