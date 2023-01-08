@@ -1,16 +1,10 @@
 <script lang="ts">
-import { blastZoneCenterX, blastZoneCenterY, blastZoneRadiusX, blastZoneRadiusY } from "@/constants/mapNumbers.js";
-import { planets } from "@/state/planetState";
 import { maxHealth, maxFuel } from "@/constants/ships";
-import { shipState, type ShipData } from "@/state/shipState";
+import { shipState } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
-import { distanceSquared } from "@/utils/math";
-import { getCollisionResult, gravityAccelerationX, gravityAccelerationY, resistanceAdjustedXSpeed, resistanceAdjustedYSpeed } from "@/utils/physics";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
-import { frameMilliseconds, frameSpeedMultiplier } from "@/constants/physics";
-import { asteroids } from "@/state/asteroidState";
-import type { MoveableSphereData } from "@/types";
+import { frameMilliseconds } from "@/constants/physics";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -27,10 +21,10 @@ const handleKeydown = (e: KeyboardEvent) => {
         shipState.ships[0].rearEngineOn = true;
     }
     if (e.key === "q") {
-        shipState.enlargen(0);
+        shipState.enlargenShip(0);
     }
     if (e.key === "e") {
-        shipState.hide(0);
+        shipState.hideShip(0);
     }
     if (e.key === "s") {
         shipState.fireAfterburner(0);
@@ -45,10 +39,10 @@ const handleKeydown = (e: KeyboardEvent) => {
         shipState.ships[1].rearEngineOn = true;
     }
     if (e.key === "u") {
-        shipState.enlargen(1);
+        shipState.enlargenShip(1);
     }
     if (e.key === "o") {
-        shipState.hide(1);
+        shipState.hideShip(1);
     }
     if (e.key === "k") {
         shipState.fireAfterburner(1);
@@ -82,104 +76,26 @@ document.addEventListener("keyup", handleKeyup);
 
 
 
-const getPlanetDamage = (shipData: { radius: number, positionX: number, positionY: number }, planetData: { positionX: number, positionY: number, radius: number, damage: number }) => {
-    if (distanceSquared(shipData.positionX, planetData.positionX, shipData.positionY, planetData.positionY) < (shipData.radius + 2 + planetData.radius) ** 2) {
-        return planetData.damage;
-    }
-    return 0;
-}
-
-const getOutOfMapDamage = (shipData: { positionX: number, positionY: number }) => {
-    if (((shipData.positionX - blastZoneCenterX) / blastZoneRadiusX) ** 2 + ((shipData.positionY - blastZoneCenterY) / blastZoneRadiusY) ** 2 > 1) {
-        return 10;
-    }
-    return 0;
-}
-
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
-
-        asteroids.forEach((asteroidData, index) => {
-            shipState.ships.forEach((objectData, shipIndex) => {
-                // TODO might need to assign differently here also would be nice to make the typing more generic
-                [asteroidData, objectData] = getCollisionResult(asteroidData, objectData) as [MoveableSphereData, ShipData] | false || [asteroidData, objectData as ShipData];
-                asteroids[index] = asteroidData;
-                shipState.ships[shipIndex] = objectData;
-            });
-            asteroids.forEach((nestedAsteroidData, nestedAsteroidIndex) => {
-                if (nestedAsteroidIndex <= index) {
-                    return;
-                }
-                [asteroidData, nestedAsteroidData] = getCollisionResult(asteroidData, nestedAsteroidData) as [MoveableSphereData, MoveableSphereData] | false || [asteroidData, nestedAsteroidData];
-                asteroids[index] = asteroidData;
-                asteroids[nestedAsteroidIndex] = nestedAsteroidData;
-            });
-            asteroidData.positionX = asteroidData.positionX + frameSpeedMultiplier * asteroidData.speedX;
-            asteroidData.positionY = asteroidData.positionY + frameSpeedMultiplier * asteroidData.speedY;
-            planets.forEach(planetData => {
-                asteroidData.speedX = asteroidData.speedX + frameSpeedMultiplier * gravityAccelerationX(planetData, asteroidData);
-                asteroidData.speedY = asteroidData.speedY + frameSpeedMultiplier * gravityAccelerationY(planetData, asteroidData);
-                asteroidData.speedX = resistanceAdjustedXSpeed(planetData, asteroidData);
-                asteroidData.speedY = resistanceAdjustedYSpeed(planetData, asteroidData);
-            });
-        });
-
-        // TODO: move ship data into array, correctly push to it at end of calculation with the rest
-        if (shipState.ships.length > 1) {
-            const [ship1Result, ship2Result] = getCollisionResult(shipState.ships[0], shipState.ships[1]) as [ShipData, ShipData] | false || shipState.ships;
-            shipState.ships[0] = ship1Result;
-            shipState.ships[1] = ship2Result;
-        }
-
+        shipState.moveForwardFrame()
         shipState.ships.forEach(shipData => {
-            shipData.positionX = shipData.positionX + frameSpeedMultiplier * shipData.speedX;
-            shipData.positionY = shipData.positionY + frameSpeedMultiplier * shipData.speedY;
-            shipData.health = shipData.health - frameSpeedMultiplier * getOutOfMapDamage(shipData);
-            planets.forEach(planetData => {
-                shipData.health = shipData.health - frameSpeedMultiplier * getPlanetDamage(shipData, planetData);
-                shipData.speedX = shipData.speedX + frameSpeedMultiplier * gravityAccelerationX(planetData, shipData);
-                shipData.speedY = shipData.speedY + frameSpeedMultiplier * gravityAccelerationY(planetData, shipData);
-                shipData.speedX = resistanceAdjustedXSpeed(planetData, shipData);
-                shipData.speedY = resistanceAdjustedYSpeed(planetData, shipData);
-            });
-
-            shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
-            shipData.angularMomentum *= 0.985 ** 4
-            if (shipData.leftEngineOn && shipData.fuel > 0) {
-                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
-                shipData.angularMomentum += frameSpeedMultiplier * shipData.sideEngineThrust
-            }
-            if (shipData.rightEngineOn && shipData.fuel > 0) {
-                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
-                shipData.angularMomentum -= frameSpeedMultiplier * shipData.sideEngineThrust
-            }
-            if (shipData.rearEngineOn && shipData.fuel > 0) {
-                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 5;
-                shipData.speedX = shipData.speedX + frameSpeedMultiplier * shipData.rearEngineThrust * Math.cos(shipData.angleRadians);
-                shipData.speedY = shipData.speedY + frameSpeedMultiplier * shipData.rearEngineThrust * Math.sin(shipData.angleRadians);
-            }
-            if (shipData.afterburnerOn && shipData.fuel > 0) {
-                shipData.fuel = shipData.fuel - frameSpeedMultiplier * 18;
-                shipData.speedX = shipData.speedX + frameSpeedMultiplier * shipData.rearEngineThrust * 2.5 * Math.cos(shipData.angleRadians);
-                shipData.speedY = shipData.speedY + frameSpeedMultiplier * shipData.rearEngineThrust * 2.5 * Math.sin(shipData.angleRadians);
-            }
-            if (shipData.fuel < maxFuel) {
-                shipData.fuel = shipData.fuel + frameSpeedMultiplier;
-            }
-            // TODO - calculate the changed state, then push it at predictable times?
-            if (shipData.health <= 0 && isRestarting === false && hasSetIsRestarting === false) {
+            if (
+                shipData.health <= 0 &&
+                isRestarting === false &&
+                hasSetIsRestarting === false
+            ) {
                 hasSetIsRestarting = true;
                 setTimeout(() => {
-                    isRestarting = true
-                }, 1000)
+                    isRestarting = true;
+                }, 1000);
                 setTimeout(() => {
-                    isRestarting = false
-                    hasSetIsRestarting = false
-                    setupStage("random", shipState.numberOfPlayers)
-                }, 1600)
+                    isRestarting = false;
+                    hasSetIsRestarting = false;
+                    setupStage("random", shipState.numberOfPlayers);
+                }, 1600);
             }
-        });
-        // console.timeLog('perf')
+        })
     }
 }
 

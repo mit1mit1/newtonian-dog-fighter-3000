@@ -1,5 +1,5 @@
 <script lang="ts">
-import { asteroids } from "@/state/asteroidState";
+import { shipState } from "@/state/shipState";
 import { defineComponent } from "vue";
 
 // let t = setInterval(updateAsteroidData, frameMilliseconds);
@@ -8,7 +8,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
     data() {
         return {
-            asteroids
+            asteroids: shipState.asteroids
         }
     },
 });

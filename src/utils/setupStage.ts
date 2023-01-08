@@ -1,6 +1,6 @@
 import { setPlanetData } from "@/state/planetState";
 import { setShipData } from "@/state/shipState";
-import { setAsteroidData } from "@/state/asteroidState";
+import { setAsteroidData } from "@/state/shipState";
 import type { NumberOfPlayers, Stage } from "@/types";
 
 const randomStages: Array<Stage> = [

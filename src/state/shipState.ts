@@ -1,14 +1,23 @@
 // store.js
 import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
-import { frameMilliseconds } from "@/constants/physics";
+import { frameMilliseconds, frameSpeedMultiplier } from "@/constants/physics";
 import {
   baseShipMass,
   baseShipRadius,
   maxFuel,
   maxHealth,
 } from "@/constants/ships";
+import { getOutOfMapDamage, getPlanetDamage } from "@/utils/game";
 import type { MoveableSphereData, NumberOfPlayers, Stage } from "@/types";
 import { reactive } from "vue";
+import { baseSunRadius, planets } from "./planetState";
+import {
+  getCollisionResult,
+  gravityAccelerationX,
+  gravityAccelerationY,
+  resistanceAdjustedXSpeed,
+  resistanceAdjustedYSpeed,
+} from "@/utils/physics";
 
 export type ShipData = MoveableSphereData & {
   rearEngineOn: boolean;
@@ -25,23 +34,24 @@ export type ShipData = MoveableSphereData & {
 };
 
 export const shipState = reactive({
+  asteroids: [] as Array<MoveableSphereData>,
   ships: [] as Array<ShipData>,
   numberOfPlayers: 2 as NumberOfPlayers,
-  enlargen(playerId: 0 | 1) {
+  enlargenShip(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
       !this.ships[playerId].moveLag
     ) {
       this.ships[playerId].radius += 5;
       this.ships[playerId].moveLag = true;
-      setTimeout(() => this.unEnlargen(playerId), frameMilliseconds * 15);
+      setTimeout(() => this.unEnlargenShip(playerId), frameMilliseconds * 15);
       setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 30);
     }
   },
-  unEnlargen(playerId: 0 | 1) {
+  unEnlargenShip(playerId: 0 | 1) {
     this.ships[playerId].radius -= 5;
   },
-  hide(playerId: 0 | 1) {
+  hideShip(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
       !this.ships[playerId].moveLag
@@ -50,13 +60,13 @@ export const shipState = reactive({
       this.ships[playerId].radius = 0;
       this.ships[playerId].moveLag = true;
       setTimeout(
-        () => this.unHide(playerId, originalRadius),
+        () => this.unHideShip(playerId, originalRadius),
         frameMilliseconds * 25
       );
       setTimeout(() => this.endMoveLag(playerId), frameMilliseconds * 40);
     }
   },
-  unHide(playerId: 0 | 1, originalRadius: number) {
+  unHideShip(playerId: 0 | 1, originalRadius: number) {
     this.ships[playerId].radius = originalRadius;
   },
   fireAfterburner(playerId: 0 | 1) {
@@ -78,6 +88,132 @@ export const shipState = reactive({
   },
   endMoveLag(playerId: 0 | 1) {
     this.ships[playerId].moveLag = false;
+  },
+  moveForwardFrame() {
+    this.asteroids.forEach((asteroidData, index) => {
+      this.ships.forEach((objectData, shipIndex) => {
+        // TODO might need to assign differently here also would be nice to make the typing more generic
+        [asteroidData, objectData] = (getCollisionResult(
+          asteroidData,
+          objectData
+        ) as [MoveableSphereData, ShipData] | false) || [
+          asteroidData,
+          objectData as ShipData,
+        ];
+        shipState.asteroids[index] = asteroidData;
+        shipState.ships[shipIndex] = objectData;
+      });
+      shipState.asteroids.forEach((nestedAsteroidData, nestedAsteroidIndex) => {
+        if (nestedAsteroidIndex <= index) {
+          return;
+        }
+        [asteroidData, nestedAsteroidData] = (getCollisionResult(
+          asteroidData,
+          nestedAsteroidData
+        ) as [MoveableSphereData, MoveableSphereData] | false) || [
+          asteroidData,
+          nestedAsteroidData,
+        ];
+        shipState.asteroids[index] = asteroidData;
+        shipState.asteroids[nestedAsteroidIndex] = nestedAsteroidData;
+      });
+      asteroidData.positionX =
+        asteroidData.positionX + frameSpeedMultiplier * asteroidData.speedX;
+      asteroidData.positionY =
+        asteroidData.positionY + frameSpeedMultiplier * asteroidData.speedY;
+      planets.forEach((planetData) => {
+        asteroidData.speedX =
+          asteroidData.speedX +
+          frameSpeedMultiplier * gravityAccelerationX(planetData, asteroidData);
+        asteroidData.speedY =
+          asteroidData.speedY +
+          frameSpeedMultiplier * gravityAccelerationY(planetData, asteroidData);
+        asteroidData.speedX = resistanceAdjustedXSpeed(
+          planetData,
+          asteroidData
+        );
+        asteroidData.speedY = resistanceAdjustedYSpeed(
+          planetData,
+          asteroidData
+        );
+      });
+    });
+    // TODO: move ship data into array, correctly push to it at end of calculation with the rest
+    if (shipState.ships.length > 1) {
+      const [shipResult1, shipResult2] =
+        (getCollisionResult(shipState.ships[0], shipState.ships[1]) as
+          | [ShipData, ShipData]
+          | false) || shipState.ships;
+      shipState.ships[0] = shipResult1;
+      shipState.ships[1] = shipResult2;
+    }
+
+    shipState.ships.forEach((shipData) => {
+      shipData.positionX =
+        shipData.positionX + frameSpeedMultiplier * shipData.speedX;
+      shipData.positionY =
+        shipData.positionY + frameSpeedMultiplier * shipData.speedY;
+      shipData.health =
+        shipData.health - frameSpeedMultiplier * getOutOfMapDamage(shipData);
+      planets.forEach((planetData) => {
+        shipData.health =
+          shipData.health -
+          frameSpeedMultiplier * getPlanetDamage(shipData, planetData);
+        shipData.speedX =
+          shipData.speedX +
+          frameSpeedMultiplier * gravityAccelerationX(planetData, shipData);
+        shipData.speedY =
+          shipData.speedY +
+          frameSpeedMultiplier * gravityAccelerationY(planetData, shipData);
+        shipData.speedX = resistanceAdjustedXSpeed(planetData, shipData);
+        shipData.speedY = resistanceAdjustedYSpeed(planetData, shipData);
+      });
+
+      shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
+      shipData.angularMomentum *= 0.985 ** 4;
+      if (shipData.leftEngineOn && shipData.fuel > 0) {
+        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+        shipData.angularMomentum +=
+          frameSpeedMultiplier * shipData.sideEngineThrust;
+      }
+      if (shipData.rightEngineOn && shipData.fuel > 0) {
+        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+        shipData.angularMomentum -=
+          frameSpeedMultiplier * shipData.sideEngineThrust;
+      }
+      if (shipData.rearEngineOn && shipData.fuel > 0) {
+        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 5;
+        shipData.speedX =
+          shipData.speedX +
+          frameSpeedMultiplier *
+            shipData.rearEngineThrust *
+            Math.cos(shipData.angleRadians);
+        shipData.speedY =
+          shipData.speedY +
+          frameSpeedMultiplier *
+            shipData.rearEngineThrust *
+            Math.sin(shipData.angleRadians);
+      }
+      if (shipData.afterburnerOn && shipData.fuel > 0) {
+        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 18;
+        shipData.speedX =
+          shipData.speedX +
+          frameSpeedMultiplier *
+            shipData.rearEngineThrust *
+            2.5 *
+            Math.cos(shipData.angleRadians);
+        shipData.speedY =
+          shipData.speedY +
+          frameSpeedMultiplier *
+            shipData.rearEngineThrust *
+            2.5 *
+            Math.sin(shipData.angleRadians);
+      }
+      if (shipData.fuel < maxFuel) {
+        shipData.fuel = shipData.fuel + frameSpeedMultiplier;
+      }
+      // TODO - calculate the changed state, then push it at predictable times?
+    });
   },
 });
 
@@ -122,7 +258,6 @@ const initialShip2Data: ShipData = {
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
-  shipState.ships.length = 0;
   shipState.ships.splice(0, shipState.ships.length);
   shipState.numberOfPlayers = numberOfPlayers;
   if (numberOfPlayers === 0) {
@@ -209,5 +344,105 @@ export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   }
   if (numberOfPlayers >= 2) {
     shipState.ships.push(ship2Data);
+  }
+};
+
+export const setAsteroidData = (stage: Stage) => {
+  shipState.asteroids.splice(0, shipState.asteroids.length);
+  if (stage === "junkyard") {
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 + 200,
+      speedX: 0.15,
+      speedY: 0,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 - 200,
+      speedX: -0.15,
+      speedY: 0,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2 + 300,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: -0.3,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2 - 300,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: 0.3,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 + 300,
+      speedX: 0.3,
+      speedY: 0,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 - 300,
+      speedX: -0.3,
+      speedY: 0,
+      radius: 6,
+    });
+  } else if (stage === "pinball") {
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 3; j++) {
+        shipState.asteroids.push({
+          mass: baseShipMass,
+          positionX: viewboxWidth / 2 - 450 + 225 * i,
+          positionY: viewboxHeight / 2 - 225 + 225 * j,
+          speedX: 0,
+          speedY: 0,
+          radius: 6,
+        });
+      }
+    }
+  } else if (stage === "newtonsCanons") {
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 - baseSunRadius - 6 - 6,
+      speedX: 0.522,
+      speedY: 0,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2 - baseSunRadius - 6 - 6,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: -0.48,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2 + baseSunRadius + 6 + 6,
+      positionY: viewboxHeight / 2,
+      speedX: 0,
+      speedY: 0.6,
+      radius: 6,
+    });
+    shipState.asteroids.push({
+      mass: baseShipMass,
+      positionX: viewboxWidth / 2,
+      positionY: viewboxHeight / 2 + baseSunRadius + 6 + 6,
+      speedX: -0.8,
+      speedY: 0,
+      radius: 6,
+    });
   }
 };
