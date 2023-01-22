@@ -31,6 +31,7 @@ export type ShipData = MoveableSphereData & {
   sideEngineThrust: number;
   moveLag: boolean;
   fuel: number;
+  destroyed: boolean;
 };
 
 export const shipState = reactive({
@@ -88,6 +89,25 @@ export const shipState = reactive({
   },
   endMoveLag(playerId: 0 | 1) {
     this.ships[playerId].moveLag = false;
+  },
+  pushExplosion(
+    positionX: number,
+    positionY: number,
+    speedX: number,
+    speedY: number
+  ) {
+    for (let i = -1; i < 2; i = i + 2) {
+      for (let j = -1; j < 2; j = j + 2) {
+        this.asteroids.push({
+          positionX: positionX + i * 12,
+          positionY: positionY + j * 12,
+          speedX: speedX + i * 2.5,
+          speedY: speedY + j * 2.5,
+          radius: 4,
+          mass: 2,
+        });
+      }
+    }
   },
   moveForwardFrame() {
     this.asteroids.forEach((asteroidData, index) => {
@@ -149,6 +169,9 @@ export const shipState = reactive({
     }
 
     shipState.ships.forEach((shipData) => {
+      if (shipData.destroyed) {
+        return;
+      }
       shipData.positionX =
         shipData.positionX + frameSpeedMultiplier * shipData.speedX;
       shipData.positionY =
@@ -212,6 +235,15 @@ export const shipState = reactive({
       if (shipData.fuel < maxFuel) {
         shipData.fuel = shipData.fuel + frameSpeedMultiplier;
       }
+      if (shipData.health < 0) {
+        shipState.pushExplosion(
+          shipData.positionX,
+          shipData.positionY,
+          shipData.speedX,
+          shipData.speedY
+        );
+        shipData.destroyed = true;
+      }
       // TODO - calculate the changed state, then push it at predictable times?
     });
   },
@@ -235,6 +267,7 @@ const initialShip1Data: ShipData = {
   moveLag: false,
   mass: baseShipMass,
   fuel: maxFuel,
+  destroyed: false,
 };
 
 const initialShip2Data: ShipData = {
@@ -255,6 +288,7 @@ const initialShip2Data: ShipData = {
   moveLag: false,
   mass: baseShipMass,
   fuel: maxFuel,
+  destroyed: false,
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
