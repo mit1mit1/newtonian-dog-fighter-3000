@@ -18,6 +18,7 @@ import {
   resistanceAdjustedXSpeed,
   resistanceAdjustedYSpeed,
 } from "@/utils/physics";
+import { isOverlapping } from "@/utils/math";
 
 export type ShipData = MoveableSphereData & {
   rearEngineOn: boolean;
@@ -68,7 +69,30 @@ export const shipState = reactive({
     }
   },
   unHideShip(playerId: 0 | 1, originalRadius: number) {
-    this.ships[playerId].radius = originalRadius;
+    const restoredShip = { ...this.ships[playerId], radius: originalRadius };
+    let canUnHide = true;
+    this.ships.forEach((ship, index) => {
+      if (index != playerId) {
+        if (isOverlapping(ship, restoredShip)) {
+          canUnHide = false;
+        }
+      }
+    });
+    this.asteroids.forEach((asteriod) => {
+      if (canUnHide) {
+        if (isOverlapping(asteriod, restoredShip)) {
+          canUnHide = false;
+        }
+      }
+    });
+    if (canUnHide) {
+      this.ships[playerId].radius = originalRadius;
+    } else {
+      setTimeout(
+        () => this.unHideShip(playerId, originalRadius),
+        frameMilliseconds * 3
+      );
+    }
   },
   fireAfterburner(playerId: 0 | 1) {
     if (
