@@ -10,7 +10,8 @@ let isRestarting = false;
 let hasSetIsRestarting = false;
 
 
-const handleKeydown = (e: KeyboardEvent) => {
+const handlePlayer1Keypress = (e: KeyboardEvent) => {
+    // Player 1
     if (e.key === "d") {
         shipState.ships[0].leftEngineOn = true;
     }
@@ -29,6 +30,9 @@ const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "s") {
         shipState.fireAfterburner(0);
     }
+}
+const handlePlayer2Keypress = (e: KeyboardEvent) => {
+    // Player 2
     if (e.key === "l") {
         shipState.ships[1].leftEngineOn = true;
     }
@@ -49,8 +53,7 @@ const handleKeydown = (e: KeyboardEvent) => {
     }
 }
 
-// console.time('perf')
-const handleKeyup = (e: KeyboardEvent) => {
+const handlePlayer1Keyup = (e: KeyboardEvent) => {
     if (e.key === "d") {
         shipState.ships[0].leftEngineOn = false;
     }
@@ -60,6 +63,9 @@ const handleKeyup = (e: KeyboardEvent) => {
     if (e.key === "w") {
         shipState.ships[0].rearEngineOn = false;
     }
+}
+
+const handlePlayer2Keyup = (e: KeyboardEvent) => {
     if (e.key === "l") {
         shipState.ships[1].leftEngineOn = false;
     }
@@ -71,13 +77,21 @@ const handleKeyup = (e: KeyboardEvent) => {
     }
 }
 
-document.addEventListener("keydown", handleKeydown);
-document.addEventListener("keyup", handleKeyup);
+document.addEventListener("keydown", handlePlayer1Keypress);
+document.addEventListener("keyup", handlePlayer1Keyup);
 
+let player2AI = false;
+if (!player2AI) {
+    document.addEventListener("keydown", handlePlayer2Keypress);
+    document.addEventListener("keyup", handlePlayer2Keyup);
+}
 
 
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
+        if (player2AI) {
+            shipState.applyAI(1);
+        }
         shipState.moveForwardFrame()
         shipState.ships.forEach(shipData => {
             if (

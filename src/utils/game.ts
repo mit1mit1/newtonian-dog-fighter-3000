@@ -42,3 +42,30 @@ export const getOutOfMapDamage = (shipData: {
   }
   return 0;
 };
+
+export const isWithinPercentOfBlastZone = (shipData: {
+  positionX: number;
+  positionY: number;
+}, percent: number) => {
+  const smallestRadii =
+    blastZoneRadiusX > blastZoneRadiusY ? blastZoneRadiusY : blastZoneRadiusX;
+  const safeCircleRadius = smallestRadii * percent;
+  if (
+    ((shipData.positionX - blastZoneCenterX) / safeCircleRadius) ** 2 +
+      ((shipData.positionY - blastZoneCenterY) / safeCircleRadius) ** 2 >
+    1
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const getSquaredDistanceFromCenter = (shipData: {
+  positionX: number;
+  positionY: number;
+}) => {
+  return (
+    (shipData.positionX - blastZoneCenterX) ** 2 +
+    (shipData.positionY - blastZoneCenterY) ** 2
+  );
+};

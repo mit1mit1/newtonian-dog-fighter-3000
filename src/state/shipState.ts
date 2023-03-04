@@ -1,5 +1,10 @@
 // store.js
-import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
+import {
+  blastZoneCenterX,
+  blastZoneCenterY,
+  viewboxHeight,
+  viewboxWidth,
+} from "@/constants/mapNumbers";
 import { frameMilliseconds, frameSpeedMultiplier } from "@/constants/physics";
 import {
   baseShipMass,
@@ -7,7 +12,12 @@ import {
   maxFuel,
   maxHealth,
 } from "@/constants/ships";
-import { getOutOfMapDamage, getPlanetDamage } from "@/utils/game";
+import {
+  getOutOfMapDamage,
+  getPlanetDamage,
+  getSquaredDistanceFromCenter,
+  isWithinPercentOfBlastZone,
+} from "@/utils/game";
 import type { MoveableSphereData, NumberOfPlayers, Stage } from "@/types";
 import { reactive } from "vue";
 import { baseSunRadius, planets } from "./planetState";
@@ -39,6 +49,99 @@ export const shipState = reactive({
   asteroids: [] as Array<MoveableSphereData>,
   ships: [] as Array<ShipData>,
   numberOfPlayers: 2 as NumberOfPlayers,
+  applyAI(playerId: 0 | 1) {
+    const shipData = this.ships[playerId];
+    const noThrustTestPosition = {
+      positionX:
+        shipData.positionX + frameSpeedMultiplier * 3 * shipData.speedX,
+      positionY:
+        shipData.positionY + frameSpeedMultiplier * 3 * shipData.speedY,
+    };
+    const forwardThrustTestPosition = {
+      positionX:
+        noThrustTestPosition.positionX +
+        baseShipRadius * Math.cos(shipData.angleRadians),
+      positionY:
+        noThrustTestPosition.positionY +
+        baseShipRadius * Math.sin(shipData.angleRadians),
+    };
+    const leftThrustTestPosition = {
+      positionX:
+        shipData.positionX +
+        baseShipRadius * Math.cos(shipData.angleRadians + Math.PI / 8),
+      positionY:
+        shipData.positionY +
+        baseShipRadius * Math.sin(shipData.angleRadians + Math.PI / 8),
+    };
+    const rightThrustTestPosition = {
+      positionX:
+        shipData.positionX +
+        baseShipRadius * Math.cos(shipData.angleRadians - Math.PI / 8),
+      positionY:
+        shipData.positionY +
+        baseShipRadius * Math.sin(shipData.angleRadians - Math.PI / 8),
+    };
+    const currentD2C = getSquaredDistanceFromCenter(shipData);
+    const noThrustD2C = getSquaredDistanceFromCenter(noThrustTestPosition);
+    const forwardThrustD2C = getSquaredDistanceFromCenter(
+      forwardThrustTestPosition
+    );
+    const leftThrustD2C = getSquaredDistanceFromCenter(leftThrustTestPosition);
+    const rightThrustD2C = getSquaredDistanceFromCenter(
+      rightThrustTestPosition
+    );
+    if (isWithinPercentOfBlastZone(shipData, 63 / 100)) {
+      if (noThrustD2C > currentD2C && noThrustD2C > forwardThrustD2C) {
+        this.ships[playerId].rearEngineOn = true;
+      } else if (
+        noThrustD2C > forwardThrustD2C &&
+        isWithinPercentOfBlastZone(shipData, 80 / 100)
+      ) {
+        this.ships[playerId].rearEngineOn = true;
+      } else {
+        this.ships[playerId].rearEngineOn = false;
+      }
+    }
+    if (isWithinPercentOfBlastZone(shipData, 40 / 100)) {
+      let idealAngle = Math.atan2(
+        shipData.positionY - blastZoneCenterY,
+        shipData.positionX - blastZoneCenterX
+      );
+      let shipAngle = shipData.angleRadians % (2 * Math.PI);
+      if (shipAngle < 0) {
+        shipAngle += 2 * Math.PI;
+      }
+      if (idealAngle < 0) {
+        idealAngle += 2 * Math.PI;
+      }
+      let difference = (shipAngle - idealAngle) % (2 * Math.PI);
+      if (difference > Math.PI) {
+        difference -= 2 * Math.PI;
+      }
+      if (difference < -Math.PI) {
+        difference += 2 * Math.PI;
+      }
+      let differenceMagnitude = Math.abs(difference % Math.PI);
+      if (differenceMagnitude > Math.PI / 2) {
+        differenceMagnitude -= Math.PI
+        differenceMagnitude = Math.abs(differenceMagnitude)
+      }
+
+      if (difference > 0 && differenceMagnitude > Math.PI / 8) {
+        this.ships[playerId].leftEngineOn = true;
+        this.ships[playerId].rightEngineOn = false;
+      } else if (difference < 0 && differenceMagnitude > Math.PI / 8) {
+        this.ships[playerId].leftEngineOn = false;
+        this.ships[playerId].rightEngineOn = true;
+      } else {
+        this.ships[playerId].leftEngineOn = false;
+        this.ships[playerId].rightEngineOn = false;
+      }
+    } else {
+      this.ships[playerId].leftEngineOn = false;
+      this.ships[playerId].rightEngineOn = false;
+    }
+  },
   enlargenShip(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
