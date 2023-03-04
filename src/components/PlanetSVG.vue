@@ -16,5 +16,5 @@ export default defineComponent({
 
 <template>
     <circle class="sun" :cx="positionX" :cy="positionY" :r="radius"
-        :fill="`rgb(${densityColorMultiplier({ radius, mass }, 7)}, ${densityColorMultiplier({ radius, mass }, 3)}, ${densityColorMultiplier({ radius, mass }, 0.1)})`" />
+        :fill="`rgb(${densityColorMultiplier({ radius, mass }, 93)}, ${densityColorMultiplier({ radius, mass }, 137)}, ${densityColorMultiplier({ radius, mass }, 201)})`" />
 </template>

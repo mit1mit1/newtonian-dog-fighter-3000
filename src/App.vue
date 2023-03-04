@@ -10,7 +10,7 @@ import {
     viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
     blastZoneCenterY
 } from "./constants/mapNumbers";
-import NapoleonicModal from "./components/NapoleonicModal.vue";
+import InstructionsModal from "./components/InstructionsModal.vue";
 
 export default defineComponent({
     data() {
@@ -25,7 +25,7 @@ export default defineComponent({
         MusicControl,
         PlanetSVG,
         ShipSVGs,
-        NapoleonicModal,
+        InstructionsModal,
         AsteroidSVGs,
     }
 });
@@ -33,9 +33,6 @@ export default defineComponent({
 
 <template>
     <main id="clickableGame">
-        <!-- <h1>
-            Orbital Fighting Game
-        </h1> -->
         <div class="game-screen">
             <svg class="spaaace" :viewBox="`0 0 ${viewboxWidth} ${viewboxHeight}`">
                 <defs>
@@ -51,16 +48,9 @@ export default defineComponent({
                 <ShipSVGs v-if="spaceState.isStarted" />
                 <AsteroidSVGs v-if="spaceState.isStarted" />
             </svg>
-            <!-- <div>
-                <span class="healthInfo">Ship 1 Health: {{ ship1Data.health }}</span>
-                <span class="healthInfo">Ship 2 Health: {{ ship2Data.health }}</span>
-            </div> -->
-            <!-- <div class="music-control-box">
-                <MusicControl />
-            </div> -->
         </div>
     </main>
-    <NapoleonicModal />
+    <InstructionsModal />
 </template>
 
 <style>

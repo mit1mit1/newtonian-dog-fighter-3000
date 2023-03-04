@@ -18,13 +18,5 @@ export const densityColorMultiplier = (
   },
   seed: number
 ) => {
-  return (
-    Math.floor(
-      ((254 * density({ mass, radius })) /
-        (density({ mass, radius }) * seed + 0.002)) %
-        254
-    ) *
-      seed +
-    1
-  );
+  return Math.floor((density({ mass, radius })* 1000 * seed) % 254);
 };
