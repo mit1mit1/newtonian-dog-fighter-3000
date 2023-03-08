@@ -137,15 +137,6 @@ export default defineComponent({
             <stop offset="100%" style="stop-color:rgb(0,255,255);stop-opacity:1" />
         </linearGradient>
     </defs>
-    <rect v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0" class="healthBar" x="50" y="500"
-        :width="200 * shipState.ships[0].health / maxHealth" height="20" rx="5" fill="url(#grad1)" />
-    <rect v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0" class="healthBar" x="800" y="500"
-        :width="200 * shipState.ships[1].health / maxHealth" height="20" rx="5" fill="url(#grad2)" />
-
-    <rect v-if="shipState.ships.length > 0 && shipState.ships[0].fuel >= 0" class="fuelBar" x="50" y="550"
-        :width="200 * shipState.ships[0].fuel / maxFuel" height="10" rx="5" fill="url(#grad2)" />
-    <rect v-if="shipState.ships.length > 1 && shipState.ships[1].fuel >= 0" class="fuelBar" x="800" y="550"
-        :width="200 * shipState.ships[1].fuel / maxFuel" height="10" rx="5" fill="url(#grad1)" />
     <g v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0">
         <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
             :r="shipState.ships[0].radius"
@@ -162,9 +153,6 @@ export default defineComponent({
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad2)" />
     </g>
-    <text v-else-if="shipState.ships.length > 0" x="80" y="500" font-family="monospace" stroke="url(#grad1)">
-        Destroyed
-    </text>
     <g v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0">
         <circle class="ship2" :cx="shipState.ships[1].positionX" :cy="shipState.ships[1].positionY"
             :r="shipState.ships[1].radius"
@@ -181,7 +169,4 @@ export default defineComponent({
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad1)" />
     </g>
-    <text v-else-if="shipState.ships.length > 1" x="830" y="500" font-family="monospace" stroke="url(#grad2)">
-        Destroyed
-    </text>
 </template>
