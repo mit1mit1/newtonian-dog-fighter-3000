@@ -5,6 +5,7 @@ import { spaceState } from "@/state/spaceState";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
 import { frameMilliseconds } from "@/constants/physics";
+import { goals } from "@/state/goalState";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -95,7 +96,7 @@ const updateShipData = () => {
         shipState.moveForwardFrame()
         shipState.ships.forEach(shipData => {
             if (
-                shipData.health <= 0 &&
+                (shipData.health <= 0 || (shipData.nextGoal && shipData.nextGoal >= goals.length)) &&
                 isRestarting === false &&
                 hasSetIsRestarting === false
             ) {
@@ -106,7 +107,7 @@ const updateShipData = () => {
                 setTimeout(() => {
                     isRestarting = false;
                     hasSetIsRestarting = false;
-                    setupStage("random", shipState.numberOfPlayers);
+                    setupStage("random", shipState.numberOfPlayers, spaceState.gameMode === "race");
                 }, 1600);
             }
         })

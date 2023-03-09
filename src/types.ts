@@ -8,7 +8,8 @@ export type Stage =
   | "freefall"
   | "junkyard"
   | "pinball"
-  | "newtonsCanons";
+  | "newtonsCanons"
+  | "raceCourseOne";
 
 export type MoveableSphereData = {
   positionX: number;

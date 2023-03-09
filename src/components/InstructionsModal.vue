@@ -3,17 +3,16 @@ import { defineComponent } from "vue";
 import MusicControl from "@/gameMusic/MusicControl.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
-import type { NumberOfPlayers, Stage } from "@/types";
+import type { Stage } from "@/types";
 let displayModal = true;
 
 let stage: Stage | "random" = "random";
-let numberOfPlayers: NumberOfPlayers = 2;
 
 export default defineComponent({
 
     data() {
         return {
-            displayModal, stage, numberOfPlayers
+            displayModal, stage, spaceState
         }
     },
 
@@ -21,7 +20,7 @@ export default defineComponent({
     methods: {
         handleFinished() {
             this.displayModal = false;
-            setupStage(this.stage, this.numberOfPlayers)
+            setupStage(this.stage, spaceState.numberOfPlayers, spaceState.gameMode === "race")
 
             setTimeout(() => {
                 spaceState.setIsStarted(true);
@@ -29,9 +28,6 @@ export default defineComponent({
         },
         pickStage(stage: Stage | "random") {
             this.stage = stage
-        },
-        setNumberOfPlayers(numberOfPlayers: NumberOfPlayers) {
-            this.numberOfPlayers = numberOfPlayers
         }
     },
 
@@ -82,15 +78,40 @@ export default defineComponent({
                                 <option value="junkyard">Junkyard</option>
                                 <option value="pinball">Pinball</option>
                                 <option value="newtonsCanons">Newton's Cannons</option>
+                                <option value="raceCourseOne">Race Course One</option>
                             </select>
                         </div>
                         <div class="control">
                             Players:
-                            <select @input="(event: any) => setNumberOfPlayers(event.target.value)" name="numberOfPlayers"
-                                id="numberOfPlayers">
+                            <select @input="(event: any) => spaceState.setNumberOfPlayers(event.target.value)"
+                                name="numberOfPlayers" id="numberOfPlayers">
+                                <option value="0">0</option>
+                                <option selected value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </div>
+                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                            Camera mode:
+                            <select @input="(event: any) => spaceState.setCameraMode(event.target.value)" name="cameraMode"
+                                id="cameraMode">
+                                <option value="fixed">Fixed</option>
+                                <option selected value="0">Track Player 1</option>
+                            </select>
+                        </div>
+                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                            Game mode:
+                            <select @input="(event: any) => spaceState.setGameMode(event.target.value)" name="gameMode"
+                                id="gameMode">
+                                <option value="race">Race</option>
+                                <option value="battle">Battle</option>
+                            </select>
+                        </div>
+                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                            Zoom:
+                            <select @input="(event: any) => spaceState.setZoom(event.target.value)" name="zoom" id="zoom">
+                                <option value="-1">-1</option>
                                 <option value="0">0</option>
                                 <option value="1">1</option>
-                                <option selected value="2">2</option>
                             </select>
                         </div>
                         <MusicControl />

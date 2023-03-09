@@ -29,6 +29,8 @@ import {
   resistanceAdjustedYSpeed,
 } from "@/utils/physics";
 import { isOverlapping } from "@/utils/math";
+import { spaceState } from "./spaceState";
+import { goals } from "./goalState";
 
 export type ShipData = MoveableSphereData & {
   rearEngineOn: boolean;
@@ -43,6 +45,7 @@ export type ShipData = MoveableSphereData & {
   moveLag: boolean;
   fuel: number;
   destroyed: boolean;
+  nextGoal: number;
 };
 
 export const shipState = reactive({
@@ -123,8 +126,8 @@ export const shipState = reactive({
       }
       let differenceMagnitude = Math.abs(difference % Math.PI);
       if (differenceMagnitude > Math.PI / 2) {
-        differenceMagnitude -= Math.PI
-        differenceMagnitude = Math.abs(differenceMagnitude)
+        differenceMagnitude -= Math.PI;
+        differenceMagnitude = Math.abs(differenceMagnitude);
       }
 
       if (difference > 0 && differenceMagnitude > Math.PI / 8) {
@@ -299,12 +302,18 @@ export const shipState = reactive({
       if (shipData.destroyed) {
         return;
       }
+      const nextGoal = goals[shipData.nextGoal];
+      if (nextGoal && isOverlapping(shipData, nextGoal)) {
+        shipData.nextGoal++;
+      }
       shipData.positionX =
         shipData.positionX + frameSpeedMultiplier * shipData.speedX;
       shipData.positionY =
         shipData.positionY + frameSpeedMultiplier * shipData.speedY;
-      shipData.health =
-        shipData.health - frameSpeedMultiplier * getOutOfMapDamage(shipData);
+      if (spaceState.gameMode === "battle") {
+        shipData.health =
+          shipData.health - frameSpeedMultiplier * getOutOfMapDamage(shipData);
+      }
       planets.forEach((planetData) => {
         shipData.health =
           shipData.health -
@@ -360,7 +369,9 @@ export const shipState = reactive({
             Math.sin(shipData.angleRadians);
       }
       if (shipData.fuel < maxFuel) {
-        shipData.fuel = shipData.fuel + frameSpeedMultiplier;
+        shipData.fuel =
+          shipData.fuel +
+          frameSpeedMultiplier * (spaceState.gameMode === "race" ? 3 : 1);
       }
       if (shipData.health < 0) {
         shipState.pushExplosion(
@@ -395,6 +406,7 @@ const initialShip1Data: ShipData = {
   mass: baseShipMass,
   fuel: maxFuel,
   destroyed: false,
+  nextGoal: 0,
 };
 
 const initialShip2Data: ShipData = {
@@ -416,6 +428,7 @@ const initialShip2Data: ShipData = {
   mass: baseShipMass,
   fuel: maxFuel,
   destroyed: false,
+  nextGoal: 0,
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {

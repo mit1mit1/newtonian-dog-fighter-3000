@@ -15,6 +15,7 @@ const baseSunResistanceMultiplyer = 0.9997;
 const basePlanetResistanceMultiplyer = 0.9999;
 const baseBlackHoleResistanceMultiplyer = 0.999;
 export const baseSunRadius = 100;
+export const baseBlackHoleMass = 100;
 
 const westBigPlanet = {
   damage: 1,
@@ -76,7 +77,7 @@ const farWestBlackHole = {
   positionX: 0.5 * viewboxWidth - 400,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
-  mass: baseSunRadius,
+  mass: baseBlackHoleMass,
   resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
@@ -85,7 +86,7 @@ const middleBlackHole = {
   positionX: 0.5 * viewboxWidth,
   positionY: 0.5 * viewboxHeight,
   radius: 20,
-  mass: baseSunRadius,
+  mass: baseBlackHoleMass,
   resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
 };
 
@@ -221,5 +222,42 @@ export const setPlanetData = (stage: Stage) => {
     planets.push(middleSun);
   } else if (stage === "pinball") {
     planets.push(gaseousSystem);
+  } else if (stage === "raceCourseOne") {
+    planets.push({
+      damage: 1,
+      positionX: 0.5 * viewboxWidth,
+      positionY: 0.5 * viewboxHeight,
+      radius: 20,
+      mass: baseBlackHoleMass,
+      resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
+    }, {
+      damage: 1,
+      positionX: 1.5 * viewboxWidth,
+      positionY: 1 * viewboxHeight,
+      radius: 20,
+      mass: baseBlackHoleMass,
+      resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
+    }, {
+      damage: 1,
+      positionX: 2 * viewboxWidth,
+      positionY: 2 * viewboxHeight,
+      radius: 20,
+      mass: baseBlackHoleMass,
+      resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
+    }, {
+      damage: 1,
+      positionX: 3 * viewboxWidth,
+      positionY: 2.5 * viewboxHeight,
+      radius: 20,
+      mass: baseBlackHoleMass,
+      resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
+    }, {
+      damage: 1,
+      positionX: 3.5 * viewboxWidth,
+      positionY: 3 * viewboxHeight,
+      radius: 20,
+      mass: baseBlackHoleMass,
+      resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
+    })
   }
 };
