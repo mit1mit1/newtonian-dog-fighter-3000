@@ -18,12 +18,13 @@ export default defineComponent({
 </script>
 
 <template>
-    <circle class="goalSVG" :cx="positionX" :cy="positionY" :r="radius" :fill="shipState.ships[0].nextGoal === index ? `yellow` : `green`" />
-    <text :x="positionX" :y="positionY">{{ index }}</text>
+    <circle class="goalSVG" :cx="positionX" :cy="positionY" :r="radius" fill="transparent" stroke-width="4" :stroke="shipState.ships[0].nextGoal === index ? `yellow` : `green`" />
+    <text  fill="white" stroke="white" class="goalText" :x="positionX - 13" :y="positionY + 13">{{ index }}</text>
 </template>
 
 <style>
-.goalSVG {
-    opacity: 0.5;
+.goalText {
+    font-size: 40px;
+    text-align: center;
 }
 </style>

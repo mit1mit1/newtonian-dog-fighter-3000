@@ -139,35 +139,35 @@ export default defineComponent({
         </linearGradient>
     </defs>
     <g v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0">
-        <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
-            :r="shipState.ships[0].radius"
-            :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
-            fill="url(#grad1)" />
         <circle v-if="shipState.ships[0].rearEngineOn && shipState.ships[0].fuel > 0" class="ship1Burner"
-            :cx="shipState.ships[0].positionX - 2 * shipState.ships[0].radius / 3" :cy="shipState.ships[0].positionY"
+            :cx="shipState.ships[0].positionX - shipState.ships[0].radius" :cy="shipState.ships[0].positionY"
             :r="shipState.ships[0].radius / 2"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad2)" />
         <circle v-if="shipState.ships[0].afterburnerOn && shipState.ships[0].fuel > 0" class="ship1Afterburner"
-            :cx="shipState.ships[0].positionX - 2 * shipState.ships[0].radius / 3" :cy="shipState.ships[0].positionY"
+            :cx="shipState.ships[0].positionX - shipState.ships[0].radius" :cy="shipState.ships[0].positionY"
             :r="2 * shipState.ships[0].radius / 3"
             :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
             fill="url(#grad2)" />
+        <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
+            :r="shipState.ships[0].radius"
+            :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
+            fill="url(#grad1)" />
     </g>
     <g v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0">
-        <circle class="ship2" :cx="shipState.ships[1].positionX" :cy="shipState.ships[1].positionY"
-            :r="shipState.ships[1].radius"
-            :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
-            fill="url(#grad2)" />
         <circle v-if="shipState.ships[1].rearEngineOn && shipState.ships[1].fuel > 0" class="ship2Burner"
-            :cx="shipState.ships[1].positionX - 2 * shipState.ships[1].radius / 3" :cy="shipState.ships[1].positionY"
+            :cx="shipState.ships[1].positionX - shipState.ships[1].radius" :cy="shipState.ships[1].positionY"
             :r="shipState.ships[1].radius / 2"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad1)" />
         <circle v-if="shipState.ships[1].afterburnerOn && shipState.ships[1].fuel > 0" class="ship2Afterburner"
-            :cx="shipState.ships[1].positionX - 2 * shipState.ships[1].radius / 3" :cy="shipState.ships[1].positionY"
+            :cx="shipState.ships[1].positionX - shipState.ships[1].radius" :cy="shipState.ships[1].positionY"
             :r="2 * shipState.ships[1].radius / 3"
             :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
             fill="url(#grad1)" />
+        <circle class="ship2" :cx="shipState.ships[1].positionX" :cy="shipState.ships[1].positionY"
+            :r="shipState.ships[1].radius"
+            :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
+            fill="url(#grad2)" />
     </g>
 </template>

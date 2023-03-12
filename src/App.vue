@@ -43,7 +43,7 @@ export default defineComponent({
         <div class="game-screen">
             <svg class="spaaace" :viewBox="`0 0 ${viewboxWidth} ${viewboxHeight}`">
 
-                <defs :id="spaceState.cameraMode">
+                <defs>
                     <linearGradient id="space" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" style="stop-color:rgb(80,50,0);stop-opacity:1" />
                         <stop offset="100%" style="stop-color:rgb(0,20,80);stop-opacity:1" />
