@@ -51,15 +51,16 @@ export default defineComponent({
                 </defs>
                 <g :transform="`scale(${Math.pow(2, spaceState.zoom)}, ${Math.pow(2, spaceState.zoom)})`">
                     <g
-                        :transform="`translate(${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode] ?
-                            -shipState.ships[spaceState.cameraMode].positionX + viewboxWidth * Math.pow(2, -1 - spaceState.zoom) : 0}, ${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode] ?
-                                -shipState.ships[spaceState.cameraMode].positionY + viewboxHeight * Math.pow(2, -1 - spaceState.zoom) : 0})`">
+                        :transform="`translate(${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
+                            -shipState.ships[spaceState.cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - spaceState.zoom) : 0}, ${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
+                                -shipState.ships[spaceState.cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - spaceState.zoom) : 0})`">
                         <ellipse v-if="spaceState.gameMode === `battle`" fill="url(#space)" :cx="blastZoneCenterX"
                             :cy="blastZoneCenterY" :rx="blastZoneRadiusX" :ry="blastZoneRadiusY" />
-                        <PlanetSVG v-for="planet in planets" :positionX="planet.positionX" :positionY="planet.positionY"
-                            :radius="planet.radius" :mass="planet.mass" />
-                        <GoalSVG v-for="goal, index in goals" :positionX="goal.positionX" :positionY="goal.positionY"
-                            :radius="goal.radius" :index="index" />
+                        <PlanetSVG v-bind:key="`${planet.positionX} ${planet.positionY}`" v-for="planet in planets"
+                            :positionX="planet.positionX" :positionY="planet.positionY" :radius="planet.radius"
+                            :mass="planet.mass" />
+                        <GoalSVG v-bind:key="`${goal.positionX} ${goal.positionY}`" v-for="goal, index in goals"
+                            :positionX="goal.positionX" :positionY="goal.positionY" :radius="goal.radius" :index="index" />
                         <ShipSVGs v-if="spaceState.isStarted" />
                         <AsteroidSVGs v-if="spaceState.isStarted" />
                     </g>
