@@ -1,10 +1,10 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import MusicControl from './gameMusic/MusicControl.vue';
 import PlanetSVG from "./components/PlanetSVG.vue";
 import GoalSVG from "./components/GoalSVG.vue";
 import ShipSVGs from "./components/ShipSVGs.vue";
 import HealthFuelBarSVGs from "./components/HealthFuelBarSVGs.vue";
+import CompassSVGs from "./components/CompassSVGs.vue";
 import AsteroidSVGs from "./components/AsteroidSVGs.vue";
 import { spaceState } from "./state/spaceState";
 import { planets } from "./state/planetState";
@@ -27,13 +27,13 @@ export default defineComponent({
     },
 
     components: {
-        MusicControl,
         GoalSVG,
         PlanetSVG,
         ShipSVGs,
         InstructionsModal,
         AsteroidSVGs,
         HealthFuelBarSVGs,
+        CompassSVGs,
     }
 });
 </script>
@@ -52,8 +52,8 @@ export default defineComponent({
                 <g :transform="`scale(${Math.pow(2, spaceState.zoom)}, ${Math.pow(2, spaceState.zoom)})`">
                     <g
                         :transform="`translate(${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
-                            -shipState.ships[spaceState.cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - spaceState.zoom) : 0}, ${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
-                                -shipState.ships[spaceState.cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - spaceState.zoom) : 0})`">
+                            -shipState.ships[spaceState.cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - spaceState.zoom) : -spaceState.zoom * viewboxWidth * Math.pow(2, -2 - spaceState.zoom)}, ${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
+                                -shipState.ships[spaceState.cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - spaceState.zoom) : -spaceState.zoom * viewboxHeight * Math.pow(2, -2 - spaceState.zoom)})`">
                         <ellipse v-if="spaceState.gameMode === `battle`" fill="url(#space)" :cx="blastZoneCenterX"
                             :cy="blastZoneCenterY" :rx="blastZoneRadiusX" :ry="blastZoneRadiusY" />
                         <PlanetSVG v-bind:key="`${planet.positionX} ${planet.positionY}`" v-for="planet in planets"
@@ -65,6 +65,7 @@ export default defineComponent({
                         <AsteroidSVGs v-if="spaceState.isStarted" />
                     </g>
                 </g>
+                <CompassSVGs v-if="spaceState.gameMode === `race`" />
                 <HealthFuelBarSVGs v-if="spaceState.isStarted" />
             </svg>
         </div>

@@ -100,7 +100,7 @@ const updateShipData = () => {
                 isRestarting === false &&
                 hasSetIsRestarting === false
             ) {
-                if (spaceState.gameMode === "race") {
+                if (spaceState.gameMode === "race" && shipData.health > 0) {
                     const localStorageIndex = shipState.stage + 'record';
                     const previousRecord = localStorage.getItem(localStorageIndex);
                     if (!previousRecord || shipState.frameNumber < parseInt(previousRecord)) {
@@ -124,7 +124,7 @@ const updateShipData = () => {
     }
 }
 
-let t = setInterval(updateShipData, frameMilliseconds);
+setInterval(updateShipData, frameMilliseconds);
 
 
 export default defineComponent({

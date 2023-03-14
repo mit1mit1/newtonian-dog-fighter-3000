@@ -6,6 +6,18 @@ export const distanceSquared = (
 ) => {
   return (x2 - x1) ** 2 + (y2 - y1) ** 2;
 };
+export const distanceBetween = (
+  point1: { positionX: number; positionY: number; radius: number },
+  point2: { positionX: number; positionY: number; radius: number }
+) =>
+  Math.sqrt(
+    distanceSquared(
+      point1.positionX,
+      point2.positionX,
+      point1.positionY,
+      point2.positionY
+    )
+  );
 
 export const directionMultiplier = (x1: number, x2: number) => {
   if (x1 === x2) {
@@ -36,3 +48,12 @@ export const isOverlapping = (
     (circle1.radius + circle2.radius) ** 2
   );
 };
+
+export const radiansBetween = (
+  fromPoint: { positionX: number; positionY: number },
+  toPoint: { positionX: number; positionY: number }
+) =>
+  Math.atan2(
+    fromPoint.positionY - toPoint.positionY,
+    fromPoint.positionX - toPoint.positionX
+  );
