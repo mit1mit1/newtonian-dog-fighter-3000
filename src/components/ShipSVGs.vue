@@ -94,12 +94,22 @@ const updateShipData = () => {
             shipState.applyAI(1);
         }
         shipState.moveForwardFrame()
-        shipState.ships.forEach(shipData => {
+        shipState.ships.forEach((shipData, index) => {
             if (
                 (shipData.health <= 0 || (shipData.nextGoal && shipData.nextGoal >= goals.length)) &&
                 isRestarting === false &&
                 hasSetIsRestarting === false
             ) {
+                if (spaceState.gameMode === "race") {
+                    const localStorageIndex = shipState.stage + 'record';
+                    const previousRecord = localStorage.getItem(localStorageIndex);
+                    if (!previousRecord || shipState.frameNumber < parseInt(previousRecord)) {
+                        localStorage.setItem(localStorageIndex, shipState.frameNumber.toString())
+                        alert('new record - ship ' + index + ' finished ' + shipState.stage + ' in ' + shipState.frameNumber + ' frames');
+                    } else {
+                        alert('ship ' + index + ' finished ' + shipState.stage + ' in ' + shipState.frameNumber + ' frames');
+                    }
+                }
                 hasSetIsRestarting = true;
                 setTimeout(() => {
                     isRestarting = true;

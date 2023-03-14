@@ -49,6 +49,8 @@ export type ShipData = MoveableSphereData & {
 };
 
 export const shipState = reactive({
+  stage: '',
+  frameNumber: 0,
   asteroids: [] as Array<MoveableSphereData>,
   ships: [] as Array<ShipData>,
   numberOfPlayers: 2 as NumberOfPlayers,
@@ -240,6 +242,7 @@ export const shipState = reactive({
     }
   },
   moveForwardFrame() {
+    this.frameNumber++;
     this.asteroids.forEach((asteroidData, index) => {
       this.ships.forEach((objectData, shipIndex) => {
         // TODO might need to assign differently here also would be nice to make the typing more generic
@@ -432,6 +435,7 @@ const initialShip2Data: ShipData = {
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
+  shipState.stage = stage;
   shipState.ships.splice(0, shipState.ships.length);
   shipState.numberOfPlayers = numberOfPlayers;
   if (numberOfPlayers === 0) {

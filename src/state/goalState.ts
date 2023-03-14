@@ -7,7 +7,7 @@ type GoalData = {
   positionY: number;
   radius: number;
 };
-export const baseGoalRadius = 20;
+export const baseGoalRadius = 25;
 
 export const goals = reactive([] as Array<GoalData>);
 
