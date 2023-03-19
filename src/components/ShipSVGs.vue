@@ -1,11 +1,12 @@
 <script lang="ts">
 import { maxHealth, maxFuel } from "@/constants/ships";
-import { shipState } from "@/state/shipState";
+import { applyAI, shipState } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
 import { defineComponent } from "vue";
 import { setupStage } from "@/utils/setupStage";
 import { frameMilliseconds } from "@/constants/physics";
 import { goals } from "@/state/goalState";
+import { planets } from "@/state/planetState";
 
 let isRestarting = false;
 let hasSetIsRestarting = false;
@@ -91,9 +92,14 @@ if (!player2AI) {
 const updateShipData = () => {
     if (!isRestarting && spaceState.isStarted) {
         if (player2AI) {
-            shipState.applyAI(1);
+            applyAI(1);
         }
         shipState.moveForwardFrame()
+        planets.forEach((planet, index) => {
+            if (planet.getNextPlanetData) { 
+                planets[index] = planet.getNextPlanetData(shipState.frameNumber, planet)
+            }
+        })
         shipState.ships.forEach((shipData, index) => {
             if (
                 (shipData.health <= 0 || (shipData.nextGoal && shipData.nextGoal >= goals.length)) &&
