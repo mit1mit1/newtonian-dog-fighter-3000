@@ -9,7 +9,8 @@ export type Stage =
   | "junkyard"
   | "pinball"
   | "newtonsCanons"
-  | "raceCourseOne";
+  | "raceCourseOne"
+  | "sol";
 
 export type MoveableSphereData = {
   positionX: number;

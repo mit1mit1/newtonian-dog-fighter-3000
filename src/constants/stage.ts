@@ -202,3 +202,141 @@ export const planet6 = {
   mass: 0.5,
   resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
+
+
+export const sol = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth,
+  positionY: 0.5 * viewboxHeight,
+  radius: baseSunRadius,
+  mass: 69,
+  resistanceMultiplier: baseSunResistanceMultiplyer,
+};
+
+export const mercury: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 200,
+  positionY: 0.5 * viewboxHeight,
+  radius: 10,
+  mass: 5,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 200 * Math.cos(frameNumber / 280),
+      positionY: 0.5 * viewboxHeight + 200 * Math.sin(frameNumber / 280),
+    };
+  },
+};
+
+export const venus: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 490,
+  positionY: 0.5 * viewboxHeight,
+  radius: 20,
+  mass: 10,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 490 * Math.cos(frameNumber / 450),
+      positionY: 0.5 * viewboxHeight + 490 * Math.sin(frameNumber / 450),
+    };
+  },
+};
+
+export const earth: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 690,
+  positionY: 0.5 * viewboxHeight,
+  radius: 20,
+  mass: 10,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 690 * Math.cos(frameNumber / 620),
+      positionY: 0.5 * viewboxHeight + 690 * Math.sin(frameNumber / 620),
+    };
+  },
+};
+
+export const mars: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 820,
+  positionY: 0.5 * viewboxHeight,
+  radius: 10,
+  mass: 3,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 820 * Math.cos(frameNumber / 780),
+      positionY: 0.5 * viewboxHeight + 820 * Math.sin(frameNumber / 780),
+    };
+  },
+};
+
+export const jupiter: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 1080,
+  positionY: 0.5 * viewboxHeight,
+  radius: 30,
+  mass: 50,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 1080 * Math.cos(frameNumber / 1300),
+      positionY: 0.5 * viewboxHeight + 1080 * Math.sin(frameNumber / 1300),
+    };
+  },
+};
+
+export const saturn: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 1380,
+  positionY: 0.5 * viewboxHeight,
+  radius: 25,
+  mass: 40,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 1380 * Math.cos(frameNumber / 1400),
+      positionY: 0.5 * viewboxHeight + 1380 * Math.sin(frameNumber / 1400),
+    };
+  },
+};
+
+export const uranus: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 1590,
+  positionY: 0.5 * viewboxHeight,
+  radius: 23,
+  mass: 37,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 1590 * Math.cos(frameNumber / 1600),
+      positionY: 0.5 * viewboxHeight + 1590 * Math.sin(frameNumber / 1600),
+    };
+  },
+};
+
+export const pluto: PlanetData = {
+  damage: 1,
+  positionX: 0.5 * viewboxWidth - 1680,
+  positionY: 0.5 * viewboxHeight,
+  radius: 5,
+  mass: 2,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX: 0.5 * viewboxWidth - 1680 * Math.cos(frameNumber / 2200),
+      positionY: 0.5 * viewboxHeight + 1680 * Math.sin(frameNumber / 2200),
+    };
+  },
+};

@@ -24,6 +24,15 @@ import {
   eastOrbitingBigPlanet,
   westOrbitingBigPlanet,
   baseSunRadius,
+  earth,
+  jupiter,
+  mars,
+  mercury,
+  pluto,
+  saturn,
+  sol,
+  uranus,
+  venus,
 } from "@/constants/stage";
 import { setGoalData } from "@/state/goalState";
 import { planets } from "@/state/planetState";
@@ -49,6 +58,7 @@ const randomRaceStages: Array<Stage> = [
   "raceCourseOne",
   "maw",
   "kongoFalls",
+  "sol",
 ];
 
 export const setupStage = (
@@ -67,6 +77,8 @@ export const setupStage = (
   }
   setGoalData(stage, isRace);
   setShipData(stage, numberOfPlayers);
+  planets.splice(0, planets.length);
+  shipState.asteroids.splice(0, shipState.asteroids.length);
   switch (stage) {
     case "battlefield":
       planets.push(middleSun);
@@ -253,6 +265,17 @@ export const setupStage = (
           resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
         }
       );
+      break;
+    case "sol":
+      planets.push(sol);
+      planets.push(mercury);
+      planets.push(venus);
+      planets.push(earth);
+      planets.push(mars);
+      planets.push(jupiter);
+      planets.push(saturn);
+      planets.push(uranus);
+      planets.push(pluto);
       break;
   }
 };
