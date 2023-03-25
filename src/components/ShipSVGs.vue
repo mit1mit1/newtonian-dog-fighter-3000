@@ -96,7 +96,7 @@ const updateShipData = () => {
         }
         shipState.moveForwardFrame()
         planets.forEach((planet, index) => {
-            if (planet.getNextPlanetData) { 
+            if (planet.getNextPlanetData) {
                 planets[index] = planet.getNextPlanetData(shipState.frameNumber, planet)
             }
         })
@@ -109,11 +109,12 @@ const updateShipData = () => {
                 if (spaceState.gameMode === "race" && shipData.health > 0) {
                     const localStorageIndex = shipState.stage + 'record';
                     const previousRecord = localStorage.getItem(localStorageIndex);
-                    if (!previousRecord || shipState.frameNumber < parseInt(previousRecord)) {
-                        localStorage.setItem(localStorageIndex, shipState.frameNumber.toString())
-                        alert('new record - ship ' + index + ' finished ' + shipState.stage + ' in ' + shipState.frameNumber + ' frames');
+                    const frames = shipState.frameNumber - (shipData?.startFrame || 0);
+                    if (!previousRecord || frames < parseInt(previousRecord)) {
+                        localStorage.setItem(localStorageIndex, frames.toString())
+                        alert('new record - ship ' + index + ' finished ' + shipState.stage + ' in ' + frames + ' frames');
                     } else {
-                        alert('ship ' + index + ' finished ' + shipState.stage + ' in ' + shipState.frameNumber + ' frames');
+                        alert('ship ' + index + ' finished ' + shipState.stage + ' in ' + frames + ' frames');
                     }
                 }
                 hasSetIsRestarting = true;

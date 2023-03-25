@@ -1,4 +1,5 @@
 import { viewboxWidth, viewboxHeight } from "@/constants/mapNumbers";
+import { baseShipMass } from "@/constants/ships";
 import {
   middleSun,
   westBigPlanet,
@@ -22,11 +23,11 @@ import {
   baseBlackHoleResistanceMultiplyer,
   eastOrbitingBigPlanet,
   westOrbitingBigPlanet,
+  baseSunRadius,
 } from "@/constants/stage";
 import { setGoalData } from "@/state/goalState";
 import { planets } from "@/state/planetState";
-import { setShipData } from "@/state/shipState";
-import { setAsteroidData } from "@/state/shipState";
+import { setShipData, shipState } from "@/state/shipState";
 import type { NumberOfPlayers, Stage } from "@/types";
 
 const randomBattleStages: Array<Stage> = [
@@ -66,8 +67,6 @@ export const setupStage = (
   }
   setGoalData(stage, isRace);
   setShipData(stage, numberOfPlayers);
-  setAsteroidData(stage);
-  planets.splice(0, planets.length);
   switch (stage) {
     case "battlefield":
       planets.push(middleSun);
@@ -78,7 +77,7 @@ export const setupStage = (
       planets.push(planet5);
       planets.push(planet6);
       break;
-    case "finalDestination" || "newtonsCanons":
+    case "finalDestination":
       planets.push(middleSun);
       break;
     case "pokemonStadium":
@@ -111,9 +110,105 @@ export const setupStage = (
       break;
     case "junkyard":
       planets.push(middleSun);
+
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 + 200,
+        speedX: 0.15,
+        speedY: 0,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 - 200,
+        speedX: -0.15,
+        speedY: 0,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2 + 300,
+        positionY: viewboxHeight / 2,
+        speedX: 0,
+        speedY: -0.3,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2 - 300,
+        positionY: viewboxHeight / 2,
+        speedX: 0,
+        speedY: 0.3,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 + 300,
+        speedX: 0.3,
+        speedY: 0,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 - 300,
+        speedX: -0.3,
+        speedY: 0,
+        radius: 6,
+      });
       break;
     case "pinball":
       planets.push(gaseousSystem);
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 3; j++) {
+          shipState.asteroids.push({
+            mass: baseShipMass,
+            positionX: viewboxWidth / 2 - 450 + 225 * i,
+            positionY: viewboxHeight / 2 - 225 + 225 * j,
+            speedX: 0,
+            speedY: 0,
+            radius: 6,
+          });
+        }
+      }
+      break;
+    case "newtonsCanons":
+      planets.push(middleSun);
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 - baseSunRadius - 6 - 6,
+        speedX: 0.522,
+        speedY: 0,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2 - baseSunRadius - 6 - 6,
+        positionY: viewboxHeight / 2,
+        speedX: 0,
+        speedY: -0.48,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2 + baseSunRadius + 6 + 6,
+        positionY: viewboxHeight / 2,
+        speedX: 0,
+        speedY: 0.6,
+        radius: 6,
+      });
+      shipState.asteroids.push({
+        mass: baseShipMass,
+        positionX: viewboxWidth / 2,
+        positionY: viewboxHeight / 2 + baseSunRadius + 6 + 6,
+        speedX: -0.8,
+        speedY: 0,
+        radius: 6,
+      });
       break;
     case "raceCourseOne":
       planets.push(
