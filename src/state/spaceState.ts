@@ -2,7 +2,8 @@
 import type { NumberOfPlayers } from "@/types";
 import { reactive } from "vue";
 
-type CameraMode = "fixed" | 0 | 1;
+export type CameraMode = "fixed" | 0 | 1;
+export const fixedCamera: CameraMode = "fixed"; 
 type GameMode = "race" | "battle";
 
 export const spaceState = reactive<{

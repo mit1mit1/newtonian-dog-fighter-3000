@@ -110,7 +110,9 @@ export default defineComponent({
                         <div v-if="spaceState.numberOfPlayers == 1" class="control">
                             Zoom:
                             <select @input="(event: any) => spaceState.setZoom(event.target.value)" name="zoom" id="zoom">
-                                <option value="-1">-1</option>
+                                <option value="-2.5">-2.5</option>
+                                <option value="-2">-2</option>
+                                <option value="-1" selected>-1</option>
                                 <option value="0">0</option>
                                 <option value="1">1</option>
                             </select>
