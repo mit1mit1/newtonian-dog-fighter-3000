@@ -30,7 +30,7 @@ export default defineComponent({
 
     <g v-if="shipState.ships.length > 0">
         <text x="50" y="460" font-family="monospace" stroke="url(#grad1)">
-            {{ (distanceBetween(goals[shipState.ships[0].nextGoal], shipState.ships[0]) - goals[shipState.ships[0].nextGoal].radius).toFixed(2) }}
+            {{ (distanceBetween(goals[shipState.ships[0].nextGoal], shipState.ships[0]) - goals[shipState.ships[0].nextGoal].radius - shipState.ships[0].radius).toFixed(2) }}
         </text>
         <g
             :transform="`rotate(${radiansBetween(goals[shipState.ships[0].nextGoal], shipState.ships[0]) * 180 / Math.PI}, 50, 400)`">
@@ -41,7 +41,7 @@ export default defineComponent({
     </g>
     <g v-if="shipState.ships.length > 1">
         <text x="800" y="460" font-family="monospace" stroke="url(#grad2)">
-            {{ (distanceBetween(goals[shipState.ships[1].nextGoal], shipState.ships[1]) - goals[shipState.ships[1].nextGoal].radius).toFixed(2) }}
+            {{ (distanceBetween(goals[shipState.ships[1].nextGoal], shipState.ships[1]) - goals[shipState.ships[1].nextGoal].radius - shipState.ships[1].radius).toFixed(2) }}
         </text>
         <g
             :transform="`rotate(${radiansBetween(goals[shipState.ships[1].nextGoal], shipState.ships[1]) * 180 / Math.PI}, 800, 400)`">
