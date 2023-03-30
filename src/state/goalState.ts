@@ -72,5 +72,49 @@ export const setGoalData = (stage: Stage, isRace?: boolean) => {
         radius: baseGoalRadius,
       }
     );
+  } else if (stage === "sol") {
+    goals.push(
+      {
+        positionX: 200,
+        positionY: 300,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 700,
+        positionY: 800,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 1800,
+        positionY: 600,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 2100,
+        positionY: -200,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 1800,
+        positionY: 1800,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 1500,
+        positionY: -800,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: -900,
+        positionY: 700,
+        radius: baseGoalRadius,
+      },
+      {
+        positionX: 300,
+        positionY: 300,
+        radius: baseGoalRadius,
+      },
+      middleGoal
+    );
   }
 };

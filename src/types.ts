@@ -9,7 +9,8 @@ export type Stage =
   | "junkyard"
   | "pinball"
   | "newtonsCanons"
-  | "raceCourseOne";
+  | "raceCourseOne"
+  | "sol";
 
 export type MoveableSphereData = {
   positionX: number;
@@ -21,3 +22,16 @@ export type MoveableSphereData = {
 };
 
 export type NumberOfPlayers = 0 | 1 | 2;
+
+export type PlanetData = {
+  positionX: number;
+  positionY: number;
+  radius: number;
+  mass: number;
+  resistanceMultiplier: number;
+  damage: number;
+  getNextPlanetData?: (
+    frameNumber: number,
+    currentPlanetData: PlanetData
+  ) => PlanetData;
+};

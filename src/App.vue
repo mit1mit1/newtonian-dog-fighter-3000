@@ -6,15 +6,28 @@ import ShipSVGs from "./components/ShipSVGs.vue";
 import HealthFuelBarSVGs from "./components/HealthFuelBarSVGs.vue";
 import CompassSVGs from "./components/CompassSVGs.vue";
 import AsteroidSVGs from "./components/AsteroidSVGs.vue";
-import { spaceState } from "./state/spaceState";
+import { spaceState, type CameraMode, fixedCamera } from "./state/spaceState";
 import { planets } from "./state/planetState";
 import {
     viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
     blastZoneCenterY
 } from "./constants/mapNumbers";
 import InstructionsModal from "./components/InstructionsModal.vue";
-import { shipState } from "./state/shipState";
+import { shipState, type ShipData } from "./state/shipState";
 import { goals } from "./state/goalState";
+import { middleBlackHole } from "./constants/stage";
+
+const getTransformLegacy = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
+    return `translate(${cameraMode !== fixedCamera && ships[cameraMode as number] ?
+        -ships[cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - zoom) : -zoom * viewboxWidth * Math.pow(2, -2 - zoom)}, ${cameraMode !== fixedCamera && ships[cameraMode as number] ?
+            -ships[cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - zoom) : -zoom * viewboxHeight * Math.pow(2, -2 - zoom)})`
+}
+
+const getTransform = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
+    const focalPoint = cameraMode !== fixedCamera && ships[cameraMode as number] ?
+        ships[cameraMode as number] : middleBlackHole;
+    return `translate(${-focalPoint.positionX + viewboxWidth * Math.pow(2, -1 - zoom)}, ${-focalPoint.positionY + viewboxHeight * Math.pow(2, -1 - zoom)})`
+}
 
 export default defineComponent({
 
@@ -22,7 +35,7 @@ export default defineComponent({
         return {
             planets, viewboxWidth,
             viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
-            blastZoneCenterY, spaceState, shipState, fixedCamera: "fixed", goals
+            blastZoneCenterY, spaceState, shipState, fixedCamera, goals, getTransform
         }
     },
 
@@ -50,10 +63,7 @@ export default defineComponent({
                     </linearGradient>
                 </defs>
                 <g :transform="`scale(${Math.pow(2, spaceState.zoom)}, ${Math.pow(2, spaceState.zoom)})`">
-                    <g
-                        :transform="`translate(${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
-                            -shipState.ships[spaceState.cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - spaceState.zoom) : -spaceState.zoom * viewboxWidth * Math.pow(2, -2 - spaceState.zoom)}, ${spaceState.cameraMode !== fixedCamera && shipState.ships[spaceState.cameraMode as number] ?
-                                -shipState.ships[spaceState.cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - spaceState.zoom) : -spaceState.zoom * viewboxHeight * Math.pow(2, -2 - spaceState.zoom)})`">
+                    <g :transform="getTransform(spaceState.cameraMode, spaceState.zoom, shipState.ships)">
                         <ellipse v-if="spaceState.gameMode === `battle`" fill="url(#space)" :cx="blastZoneCenterX"
                             :cy="blastZoneCenterY" :rx="blastZoneRadiusX" :ry="blastZoneRadiusY" />
                         <PlanetSVG v-bind:key="`${planet.positionX} ${planet.positionY}`" v-for="planet in planets"

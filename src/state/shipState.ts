@@ -20,7 +20,7 @@ import {
 } from "@/utils/game";
 import type { MoveableSphereData, NumberOfPlayers, Stage } from "@/types";
 import { reactive } from "vue";
-import { baseSunRadius, planets } from "./planetState";
+import { planets } from "./planetState";
 import {
   getCollisionResult,
   gravityAccelerationX,
@@ -31,6 +31,7 @@ import {
 import { isOverlapping } from "@/utils/math";
 import { spaceState } from "./spaceState";
 import { goals } from "./goalState";
+import { baseSunRadius } from "@/constants/stage";
 
 export type ShipData = MoveableSphereData & {
   rearEngineOn: boolean;
@@ -46,107 +47,15 @@ export type ShipData = MoveableSphereData & {
   fuel: number;
   destroyed: boolean;
   nextGoal: number;
+  startFrame?: number;
 };
 
 export const shipState = reactive({
-  stage: '',
+  stage: "",
   frameNumber: 0,
   asteroids: [] as Array<MoveableSphereData>,
   ships: [] as Array<ShipData>,
   numberOfPlayers: 2 as NumberOfPlayers,
-  applyAI(playerId: 0 | 1) {
-    const shipData = this.ships[playerId];
-    const noThrustTestPosition = {
-      positionX:
-        shipData.positionX + frameSpeedMultiplier * 3 * shipData.speedX,
-      positionY:
-        shipData.positionY + frameSpeedMultiplier * 3 * shipData.speedY,
-    };
-    const forwardThrustTestPosition = {
-      positionX:
-        noThrustTestPosition.positionX +
-        baseShipRadius * Math.cos(shipData.angleRadians),
-      positionY:
-        noThrustTestPosition.positionY +
-        baseShipRadius * Math.sin(shipData.angleRadians),
-    };
-    const leftThrustTestPosition = {
-      positionX:
-        shipData.positionX +
-        baseShipRadius * Math.cos(shipData.angleRadians + Math.PI / 8),
-      positionY:
-        shipData.positionY +
-        baseShipRadius * Math.sin(shipData.angleRadians + Math.PI / 8),
-    };
-    const rightThrustTestPosition = {
-      positionX:
-        shipData.positionX +
-        baseShipRadius * Math.cos(shipData.angleRadians - Math.PI / 8),
-      positionY:
-        shipData.positionY +
-        baseShipRadius * Math.sin(shipData.angleRadians - Math.PI / 8),
-    };
-    const currentD2C = getSquaredDistanceFromCenter(shipData);
-    const noThrustD2C = getSquaredDistanceFromCenter(noThrustTestPosition);
-    const forwardThrustD2C = getSquaredDistanceFromCenter(
-      forwardThrustTestPosition
-    );
-    const leftThrustD2C = getSquaredDistanceFromCenter(leftThrustTestPosition);
-    const rightThrustD2C = getSquaredDistanceFromCenter(
-      rightThrustTestPosition
-    );
-    if (isWithinPercentOfBlastZone(shipData, 63 / 100)) {
-      if (noThrustD2C > currentD2C && noThrustD2C > forwardThrustD2C) {
-        this.ships[playerId].rearEngineOn = true;
-      } else if (
-        noThrustD2C > forwardThrustD2C &&
-        isWithinPercentOfBlastZone(shipData, 80 / 100)
-      ) {
-        this.ships[playerId].rearEngineOn = true;
-      } else {
-        this.ships[playerId].rearEngineOn = false;
-      }
-    }
-    if (isWithinPercentOfBlastZone(shipData, 40 / 100)) {
-      let idealAngle = Math.atan2(
-        shipData.positionY - blastZoneCenterY,
-        shipData.positionX - blastZoneCenterX
-      );
-      let shipAngle = shipData.angleRadians % (2 * Math.PI);
-      if (shipAngle < 0) {
-        shipAngle += 2 * Math.PI;
-      }
-      if (idealAngle < 0) {
-        idealAngle += 2 * Math.PI;
-      }
-      let difference = (shipAngle - idealAngle) % (2 * Math.PI);
-      if (difference > Math.PI) {
-        difference -= 2 * Math.PI;
-      }
-      if (difference < -Math.PI) {
-        difference += 2 * Math.PI;
-      }
-      let differenceMagnitude = Math.abs(difference % Math.PI);
-      if (differenceMagnitude > Math.PI / 2) {
-        differenceMagnitude -= Math.PI;
-        differenceMagnitude = Math.abs(differenceMagnitude);
-      }
-
-      if (difference > 0 && differenceMagnitude > Math.PI / 8) {
-        this.ships[playerId].leftEngineOn = true;
-        this.ships[playerId].rightEngineOn = false;
-      } else if (difference < 0 && differenceMagnitude > Math.PI / 8) {
-        this.ships[playerId].leftEngineOn = false;
-        this.ships[playerId].rightEngineOn = true;
-      } else {
-        this.ships[playerId].leftEngineOn = false;
-        this.ships[playerId].rightEngineOn = false;
-      }
-    } else {
-      this.ships[playerId].leftEngineOn = false;
-      this.ships[playerId].rightEngineOn = false;
-    }
-  },
   enlargenShip(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
@@ -307,6 +216,9 @@ export const shipState = reactive({
       }
       const nextGoal = goals[shipData.nextGoal];
       if (nextGoal && isOverlapping(shipData, nextGoal)) {
+        if (shipData.nextGoal === 0) {
+          shipData.startFrame = shipState.frameNumber;
+        }
         shipData.nextGoal++;
       }
       shipData.positionX =
@@ -525,102 +437,92 @@ export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   }
 };
 
-export const setAsteroidData = (stage: Stage) => {
-  shipState.asteroids.splice(0, shipState.asteroids.length);
-  if (stage === "junkyard") {
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 + 200,
-      speedX: 0.15,
-      speedY: 0,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 - 200,
-      speedX: -0.15,
-      speedY: 0,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2 + 300,
-      positionY: viewboxHeight / 2,
-      speedX: 0,
-      speedY: -0.3,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2 - 300,
-      positionY: viewboxHeight / 2,
-      speedX: 0,
-      speedY: 0.3,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 + 300,
-      speedX: 0.3,
-      speedY: 0,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 - 300,
-      speedX: -0.3,
-      speedY: 0,
-      radius: 6,
-    });
-  } else if (stage === "pinball") {
-    for (let i = 0; i < 5; i++) {
-      for (let j = 0; j < 3; j++) {
-        shipState.asteroids.push({
-          mass: baseShipMass,
-          positionX: viewboxWidth / 2 - 450 + 225 * i,
-          positionY: viewboxHeight / 2 - 225 + 225 * j,
-          speedX: 0,
-          speedY: 0,
-          radius: 6,
-        });
-      }
+export const applyAI = (playerId: 0 | 1) => {
+  const shipData = shipState.ships[playerId];
+  const noThrustTestPosition = {
+    positionX: shipData.positionX + frameSpeedMultiplier * 3 * shipData.speedX,
+    positionY: shipData.positionY + frameSpeedMultiplier * 3 * shipData.speedY,
+  };
+  const forwardThrustTestPosition = {
+    positionX:
+      noThrustTestPosition.positionX +
+      baseShipRadius * Math.cos(shipData.angleRadians),
+    positionY:
+      noThrustTestPosition.positionY +
+      baseShipRadius * Math.sin(shipData.angleRadians),
+  };
+  const leftThrustTestPosition = {
+    positionX:
+      shipData.positionX +
+      baseShipRadius * Math.cos(shipData.angleRadians + Math.PI / 8),
+    positionY:
+      shipData.positionY +
+      baseShipRadius * Math.sin(shipData.angleRadians + Math.PI / 8),
+  };
+  const rightThrustTestPosition = {
+    positionX:
+      shipData.positionX +
+      baseShipRadius * Math.cos(shipData.angleRadians - Math.PI / 8),
+    positionY:
+      shipData.positionY +
+      baseShipRadius * Math.sin(shipData.angleRadians - Math.PI / 8),
+  };
+  const currentD2C = getSquaredDistanceFromCenter(shipData);
+  const noThrustD2C = getSquaredDistanceFromCenter(noThrustTestPosition);
+  const forwardThrustD2C = getSquaredDistanceFromCenter(
+    forwardThrustTestPosition
+  );
+  const leftThrustD2C = getSquaredDistanceFromCenter(leftThrustTestPosition);
+  const rightThrustD2C = getSquaredDistanceFromCenter(rightThrustTestPosition);
+  if (isWithinPercentOfBlastZone(shipData, 63 / 100)) {
+    if (noThrustD2C > currentD2C && noThrustD2C > forwardThrustD2C) {
+      shipState.ships[playerId].rearEngineOn = true;
+    } else if (
+      noThrustD2C > forwardThrustD2C &&
+      isWithinPercentOfBlastZone(shipData, 80 / 100)
+    ) {
+      shipState.ships[playerId].rearEngineOn = true;
+    } else {
+      shipState.ships[playerId].rearEngineOn = false;
     }
-  } else if (stage === "newtonsCanons") {
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 - baseSunRadius - 6 - 6,
-      speedX: 0.522,
-      speedY: 0,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2 - baseSunRadius - 6 - 6,
-      positionY: viewboxHeight / 2,
-      speedX: 0,
-      speedY: -0.48,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2 + baseSunRadius + 6 + 6,
-      positionY: viewboxHeight / 2,
-      speedX: 0,
-      speedY: 0.6,
-      radius: 6,
-    });
-    shipState.asteroids.push({
-      mass: baseShipMass,
-      positionX: viewboxWidth / 2,
-      positionY: viewboxHeight / 2 + baseSunRadius + 6 + 6,
-      speedX: -0.8,
-      speedY: 0,
-      radius: 6,
-    });
+  }
+  if (isWithinPercentOfBlastZone(shipData, 40 / 100)) {
+    let idealAngle = Math.atan2(
+      shipData.positionY - blastZoneCenterY,
+      shipData.positionX - blastZoneCenterX
+    );
+    let shipAngle = shipData.angleRadians % (2 * Math.PI);
+    if (shipAngle < 0) {
+      shipAngle += 2 * Math.PI;
+    }
+    if (idealAngle < 0) {
+      idealAngle += 2 * Math.PI;
+    }
+    let difference = (shipAngle - idealAngle) % (2 * Math.PI);
+    if (difference > Math.PI) {
+      difference -= 2 * Math.PI;
+    }
+    if (difference < -Math.PI) {
+      difference += 2 * Math.PI;
+    }
+    let differenceMagnitude = Math.abs(difference % Math.PI);
+    if (differenceMagnitude > Math.PI / 2) {
+      differenceMagnitude -= Math.PI;
+      differenceMagnitude = Math.abs(differenceMagnitude);
+    }
+
+    if (difference > 0 && differenceMagnitude > Math.PI / 8) {
+      shipState.ships[playerId].leftEngineOn = true;
+      shipState.ships[playerId].rightEngineOn = false;
+    } else if (difference < 0 && differenceMagnitude > Math.PI / 8) {
+      shipState.ships[playerId].leftEngineOn = false;
+      shipState.ships[playerId].rightEngineOn = true;
+    } else {
+      shipState.ships[playerId].leftEngineOn = false;
+      shipState.ships[playerId].rightEngineOn = false;
+    }
+  } else {
+    shipState.ships[playerId].leftEngineOn = false;
+    shipState.ships[playerId].rightEngineOn = false;
   }
 };
