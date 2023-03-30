@@ -79,6 +79,7 @@ const handlePlayer2Keyup = (e: KeyboardEvent) => {
     }
 }
 
+
 document.addEventListener("keydown", handlePlayer1Keypress);
 document.addEventListener("keyup", handlePlayer1Keyup);
 
@@ -130,8 +131,25 @@ const updateShipData = () => {
         })
     }
 }
+let isPaused = false;
+let interval = setInterval(updateShipData, frameMilliseconds);
+const togglePause = () => {
+    if (isPaused) {
+        interval = setInterval(updateShipData, frameMilliseconds);
+        
+    } else {
+        clearInterval(interval);
+    }
+    isPaused = !isPaused
+}
 
-setInterval(updateShipData, frameMilliseconds);
+document.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "p") {
+        togglePause();
+    }
+});
+
+
 
 
 export default defineComponent({
