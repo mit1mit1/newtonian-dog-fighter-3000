@@ -1,16 +1,8 @@
 <script lang="ts">
 import { maxHealth, maxFuel } from "@/constants/ships";
-import { applyAI, shipState } from "@/state/shipState";
-import { spaceState } from "@/state/spaceState";
+import { gameState } from "@/state/gameState";
+import { shipState } from "@/state/shipState";
 import { defineComponent } from "vue";
-import { setupStage } from "@/utils/setupStage";
-import { frameMilliseconds } from "@/constants/physics";
-import { goals } from "@/state/goalState";
-import { planets } from "@/state/planetState";
-
-let isRestarting = false;
-let hasSetIsRestarting = false;
-
 
 const handlePlayer1Keypress = (e: KeyboardEvent) => {
     // Player 1
@@ -83,71 +75,10 @@ const handlePlayer2Keyup = (e: KeyboardEvent) => {
 document.addEventListener("keydown", handlePlayer1Keypress);
 document.addEventListener("keyup", handlePlayer1Keyup);
 
-let player2AI = false;
-if (!player2AI) {
+if (!gameState.player2AI) {
     document.addEventListener("keydown", handlePlayer2Keypress);
     document.addEventListener("keyup", handlePlayer2Keyup);
 }
-
-
-const updateShipData = () => {
-    if (!isRestarting && spaceState.isStarted) {
-        if (player2AI) {
-            applyAI(1);
-        }
-        shipState.moveForwardFrame()
-        planets.forEach((planet, index) => {
-            if (planet.getNextPlanetData) {
-                planets[index] = planet.getNextPlanetData(shipState.frameNumber, planet)
-            }
-        })
-        shipState.ships.forEach((shipData, index) => {
-            if (
-                (shipData.health <= 0 || (shipData.nextGoal && shipData.nextGoal >= goals.length)) &&
-                isRestarting === false &&
-                hasSetIsRestarting === false
-            ) {
-                if (spaceState.gameMode === "race" && shipData.health > 0) {
-                    const localStorageIndex = shipState.stage + 'record';
-                    const previousRecord = localStorage.getItem(localStorageIndex);
-                    const frames = shipState.frameNumber - (shipData?.startFrame || 0);
-                    if (!previousRecord || frames < parseInt(previousRecord)) {
-                        localStorage.setItem(localStorageIndex, frames.toString())
-                        alert('new record - ship ' + index + ' finished ' + shipState.stage + ' in ' + frames + ' frames');
-                    } else {
-                        alert('ship ' + index + ' finished ' + shipState.stage + ' in ' + frames + ' frames');
-                    }
-                }
-                hasSetIsRestarting = true;
-                setTimeout(() => {
-                    isRestarting = true;
-                }, 1000);
-                setTimeout(() => {
-                    isRestarting = false;
-                    hasSetIsRestarting = false;
-                    setupStage("random", shipState.numberOfPlayers, spaceState.gameMode === "race");
-                }, 1600);
-            }
-        })
-    }
-}
-let isPaused = false;
-let interval = setInterval(updateShipData, frameMilliseconds);
-const togglePause = () => {
-    if (isPaused) {
-        interval = setInterval(updateShipData, frameMilliseconds);
-        
-    } else {
-        clearInterval(interval);
-    }
-    isPaused = !isPaused
-}
-
-document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "p") {
-        togglePause();
-    }
-});
 
 
 

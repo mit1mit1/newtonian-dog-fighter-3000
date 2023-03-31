@@ -4,7 +4,7 @@ import MusicControl from "@/gameMusic/MusicControl.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
 import type { Stage } from "@/types";
-let displayModal = true;
+import { gameState, togglePause } from "@/state/gameState";
 
 let stage: Stage | "random" = "random";
 
@@ -12,16 +12,15 @@ export default defineComponent({
 
     data() {
         return {
-            displayModal, stage, spaceState
+            gameState, stage, spaceState
         }
     },
 
 
     methods: {
         handleFinished() {
-            this.displayModal = false;
             setupStage(this.stage, spaceState.numberOfPlayers, spaceState.gameMode === "race")
-
+            togglePause();
             setTimeout(() => {
                 spaceState.setIsStarted(true);
             }, 500)
@@ -39,7 +38,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <div v-if="displayModal">
+    <div v-if="gameState.isPaused">
         <div class="greyBackground" :onclick="handleFinished"></div>
         <div class="visibleModal">
             <div class="modalContent" @keyup.esc="handleFinished" tabindex="0">
