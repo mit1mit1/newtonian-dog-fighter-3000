@@ -203,7 +203,6 @@ export const planet6 = {
   resistanceMultiplier: basePlanetResistanceMultiplyer,
 };
 
-
 export const sol = {
   damage: 1,
   positionX: 0.5 * viewboxWidth,
@@ -212,6 +211,35 @@ export const sol = {
   mass: 69,
   resistanceMultiplier: baseSunResistanceMultiplyer,
 };
+
+export const getOrbitingPlanet = (
+  planetMass: number,
+  planetRadius: number,
+  orbitRadius: number,
+  slownessDivider: number,
+  startAngle = 0,
+  orbitDirectionMultiplier: -1 | 1 = 1, 
+  centreX = 0.5 * viewboxWidth,
+  centreY = 0.5 * viewboxHeight,
+): PlanetData => ({
+  damage: 1,
+  positionX: centreX - orbitRadius * Math.cos(startAngle),
+  positionY: centreY + orbitRadius * Math.sin(startAngle),
+  radius: planetRadius,
+  mass: planetMass,
+  resistanceMultiplier: basePlanetResistanceMultiplyer,
+  getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
+    return {
+      ...currentPlanetData,
+      positionX:
+        centreX -
+        orbitRadius * Math.cos(startAngle + orbitDirectionMultiplier * frameNumber / slownessDivider),
+      positionY:
+        centreY +
+        orbitRadius * Math.sin(startAngle + orbitDirectionMultiplier * frameNumber / slownessDivider),
+    };
+  },
+});
 
 export const mercury: PlanetData = {
   damage: 1,

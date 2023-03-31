@@ -33,6 +33,7 @@ import {
   sol,
   uranus,
   venus,
+  getOrbitingPlanet,
 } from "@/constants/stage";
 import { setGoalData } from "@/state/goalState";
 import { planets } from "@/state/planetState";
@@ -59,6 +60,7 @@ const randomRaceStages: Array<Stage> = [
   "maw",
   "kongoFalls",
   "sol",
+  "blender",
 ];
 
 export const setupStage = (
@@ -277,5 +279,12 @@ export const setupStage = (
       planets.push(uranus);
       planets.push(pluto);
       break;
+    case "blender":
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400, Math.PI))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, 0, -1))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, Math.PI, -1))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500, Math.PI))
   }
 };

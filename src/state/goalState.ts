@@ -116,5 +116,13 @@ export const setGoalData = (stage: Stage, isRace?: boolean) => {
       },
       middleGoal
     );
+  }else if (stage === "blender") {
+    goals.push(
+      middleGoal,
+      leftGoal,
+      topGoal,
+      rightGoal,
+      bottomGoal,
+    );
   }
 };

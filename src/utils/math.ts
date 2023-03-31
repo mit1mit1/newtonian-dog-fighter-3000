@@ -57,9 +57,3 @@ export const radiansBetween = (
     fromPoint.positionY - toPoint.positionY,
     fromPoint.positionX - toPoint.positionX
   );
-
-  export const currentSphereData = (
-
-  ) => {
-    
-  }

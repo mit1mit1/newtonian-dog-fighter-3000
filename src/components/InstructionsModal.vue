@@ -80,6 +80,7 @@ export default defineComponent({
                                 <option value="newtonsCanons">Newton's Cannons</option>
                                 <option value="raceCourseOne">Race Course One</option>
                                 <option value="sol">Sol</option>
+                                <option value="blender">Blender</option>
                             </select>
                         </div>
                         <div class="control">

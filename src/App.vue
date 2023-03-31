@@ -17,12 +17,6 @@ import { shipState, type ShipData } from "./state/shipState";
 import { goals } from "./state/goalState";
 import { middleBlackHole } from "./constants/stage";
 
-const getTransformLegacy = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
-    return `translate(${cameraMode !== fixedCamera && ships[cameraMode as number] ?
-        -ships[cameraMode as number].positionX + viewboxWidth * Math.pow(2, -1 - zoom) : -zoom * viewboxWidth * Math.pow(2, -2 - zoom)}, ${cameraMode !== fixedCamera && ships[cameraMode as number] ?
-            -ships[cameraMode as number].positionY + viewboxHeight * Math.pow(2, -1 - zoom) : -zoom * viewboxHeight * Math.pow(2, -2 - zoom)})`
-}
-
 const getTransform = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
     const focalPoint = cameraMode !== fixedCamera && ships[cameraMode as number] ?
         ships[cameraMode as number] : middleBlackHole;
