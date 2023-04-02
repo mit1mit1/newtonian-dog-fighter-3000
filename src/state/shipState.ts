@@ -29,7 +29,7 @@ import {
   resistanceAdjustedYSpeed,
 } from "@/utils/physics";
 import { isOverlapping } from "@/utils/math";
-import { spaceState } from "./spaceState";
+import { adjustZoom, spaceState } from "./spaceState";
 import { goals } from "./goalState";
 import { gameState } from "./gameState";
 
@@ -198,7 +198,6 @@ export const shipState = reactive({
         );
       });
     });
-    // TODO: move ship data into array, correctly push to it at end of calculation with the rest
     if (shipState.ships.length > 1) {
       const [shipResult1, shipResult2] =
         (getCollisionResult(shipState.ships[0], shipState.ships[1]) as
@@ -297,6 +296,7 @@ export const shipState = reactive({
       }
       // TODO - calculate the changed state, then push it at predictable times?
     });
+    adjustZoom();
   },
 });
 

@@ -1,9 +1,13 @@
 // store.js
 import type { NumberOfPlayers } from "@/types";
 import { reactive } from "vue";
+import { shipState } from "./shipState";
+import { middleBlackHole } from "@/constants/stage";
+import { goals } from "./goalState";
+import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
 
 export type CameraMode = "fixed" | 0 | 1;
-export const fixedCamera: CameraMode = "fixed"; 
+export const fixedCamera: CameraMode = "fixed";
 type GameMode = "race" | "battle";
 
 export const spaceState = reactive<{
@@ -17,6 +21,7 @@ export const spaceState = reactive<{
   setNumberOfPlayers: (n: NumberOfPlayers) => void;
   zoom: number;
   setZoom: (n: number) => void;
+  framesSinceZoomOut: number;
 }>({
   isStarted: false,
   setIsStarted(started: boolean) {
@@ -37,5 +42,84 @@ export const spaceState = reactive<{
   zoom: -1,
   setZoom(n: number) {
     this.zoom = n;
+    this.framesSinceZoomOut = 0;
   },
+  framesSinceZoomOut: 10,
 });
+
+export const getFocalPoint = () =>
+  spaceState.cameraMode !== fixedCamera &&
+  shipState.ships[spaceState.cameraMode as number]
+    ? shipState.ships[spaceState.cameraMode as number]
+    : middleBlackHole;
+
+const baseZoom = -1;
+const minimumZoom = -2.5;
+
+export const adjustZoom = () => {
+  const focalPoint = getFocalPoint();
+  const importantObjects = [];
+  let hasZoomed = false;
+  if (spaceState.numberOfPlayers > 0) {
+    importantObjects.push(shipState.ships[0]);
+    if (spaceState.gameMode === "race") {
+      importantObjects.push(goals[shipState.ships[0].nextGoal]);
+    }
+  }
+  if (spaceState.numberOfPlayers > 1) {
+    importantObjects.push(shipState.ships[1]);
+    if (spaceState.gameMode === "race") {
+      importantObjects.push(goals[shipState.ships[1].nextGoal]);
+    }
+  }
+  for (const importantObject of importantObjects) {
+    if (
+      Math.abs(importantObject.positionX - focalPoint.positionX) *
+        Math.pow(2, spaceState.zoom + 1.1) >
+      viewboxWidth
+    ) {
+      if (
+        Math.abs(importantObject.positionX - focalPoint.positionX) *
+          Math.pow(2, spaceState.zoom + 1) >
+        viewboxWidth
+      ) {
+        if (spaceState.zoom > minimumZoom) {
+          spaceState.zoom -= 0.005;
+        }
+      }
+      spaceState.framesSinceZoomOut = 0;
+      console.log("zoom out");
+      hasZoomed = true;
+      break;
+    }
+    if (
+      Math.abs(importantObject.positionY - focalPoint.positionY) *
+        Math.pow(2, spaceState.zoom + 1.1) >
+      viewboxHeight
+    ) {
+      if (
+        Math.abs(importantObject.positionY - focalPoint.positionY) *
+          Math.pow(2, spaceState.zoom + 1) >
+        viewboxHeight
+      ) {
+        if (spaceState.zoom > minimumZoom) {
+          spaceState.zoom -= 0.005;
+        }
+      }
+      spaceState.framesSinceZoomOut = 0;
+      console.log("zoom out");
+      hasZoomed = true;
+      break;
+    }
+  }
+  if (
+    spaceState.zoom < baseZoom &&
+    !hasZoomed &&
+    spaceState.framesSinceZoomOut > 10
+  ) {
+    console.log("zoom in", spaceState.zoom);
+    spaceState.zoom += 0.005;
+    return;
+  }
+  spaceState.framesSinceZoomOut++;
+};

@@ -6,7 +6,7 @@ import ShipSVGs from "./components/ShipSVGs.vue";
 import HealthFuelBarSVGs from "./components/HealthFuelBarSVGs.vue";
 import CompassSVGs from "./components/CompassSVGs.vue";
 import AsteroidSVGs from "./components/AsteroidSVGs.vue";
-import { spaceState, type CameraMode, fixedCamera } from "./state/spaceState";
+import { spaceState, type CameraMode, fixedCamera, getFocalPoint } from "./state/spaceState";
 import { planets } from "./state/planetState";
 import {
     viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
@@ -18,8 +18,7 @@ import { goals } from "./state/goalState";
 import { middleBlackHole } from "./constants/stage";
 
 const getTransform = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
-    const focalPoint = cameraMode !== fixedCamera && ships[cameraMode as number] ?
-        ships[cameraMode as number] : middleBlackHole;
+    const focalPoint = getFocalPoint();
     return `translate(${-focalPoint.positionX + viewboxWidth * Math.pow(2, -1 - zoom)}, ${-focalPoint.positionY + viewboxHeight * Math.pow(2, -1 - zoom)})`
 }
 
