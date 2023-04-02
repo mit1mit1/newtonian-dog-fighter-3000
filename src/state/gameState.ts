@@ -5,9 +5,15 @@ import { setupStage } from "@/utils/setupStage";
 import { goals } from "./goalState";
 import { planets } from "./planetState";
 import { applyAI, shipState } from "./shipState";
+import type { Stage } from "@/types";
 
-export const gameState = reactive({
-  stage: "",
+export const gameState: {
+  stage: Stage | "random";
+  frameNumber: number;
+  player2AI: boolean;
+  isPaused: boolean;
+} = reactive({
+  stage: "random",
   frameNumber: 0,
   player2AI: false,
   isPaused: true,
@@ -17,6 +23,7 @@ let isRestarting = false;
 let hasSetIsRestarting = false;
 
 const updateShipData = () => {
+  // console.time(`frame${gameState.frameNumber}`)
   if (!isRestarting && spaceState.isStarted) {
     if (gameState.player2AI) {
       applyAI(1);
@@ -80,6 +87,7 @@ const updateShipData = () => {
       }
     });
   }
+  // console.timeEnd(`frame${gameState.frameNumber - 1}`)
 };
 
 let interval: NodeJS.Timer;

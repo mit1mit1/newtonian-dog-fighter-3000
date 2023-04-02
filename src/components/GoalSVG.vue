@@ -20,7 +20,7 @@ export default defineComponent({
 <template>
     <circle class="goalSVG" :cx="positionX" :cy="positionY" :r="radius" fill="transparent" stroke-width="4"
         :stroke="shipState.ships[0].nextGoal === index ? `yellow` : `green`" />
-    <text fill="white" stroke="white" class="goalText" :x="(positionX ?? 0) - 13" :y="(positionY ?? 0) + 13">{{ index
+    <text fill="white" stroke="white" class="goalText" :x="(positionX ?? 0) - 11" :y="(positionY ?? 0) + 13">{{ index
     }}</text>
 </template>
 
@@ -28,5 +28,6 @@ export default defineComponent({
 .goalText {
     font-size: 40px;
     text-align: center;
+    font-family: monospace;
 }
 </style>

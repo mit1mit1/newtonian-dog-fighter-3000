@@ -1,37 +1,36 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import MusicControl from "@/gameMusic/MusicControl.vue";
+import StageSelector from "@/components/StageSelector.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
-import type { Stage } from "@/types";
 import { gameState, togglePause } from "@/state/gameState";
 
-let stage: Stage | "random" = "random";
+let selectedPage = 2;
+const pages = 3;
+
 
 export default defineComponent({
 
     data() {
         return {
-            gameState, stage, spaceState
+            gameState, spaceState, selectedPage, pages
         }
     },
 
 
     methods: {
         handleFinished() {
-            setupStage(this.stage, spaceState.numberOfPlayers, spaceState.gameMode === "race")
+            setupStage(gameState.stage, spaceState.numberOfPlayers, spaceState.gameMode === "race")
             togglePause();
             setTimeout(() => {
                 spaceState.setIsStarted(true);
             }, 500)
         },
-        pickStage(stage: Stage | "random") {
-            this.stage = stage
-        }
     },
 
     components: {
-        MusicControl,
+        MusicControl, StageSelector,
     }
 
 });
@@ -42,72 +41,71 @@ export default defineComponent({
         <div class="greyBackground" :onclick="handleFinished"></div>
         <div class="visibleModal">
             <div class="modalContent" @keyup.esc="handleFinished" tabindex="0">
-                <button class="modalCloseButton napoleonic-button" :onclick="handleFinished">x</button>
+                <button class="modalCloseButton modal-button" :onclick="handleFinished">x</button>
                 <h2 class="modalTitle">Welcome to the arena</h2>
-                <div class="modalBody">
-                    <div class="controlsBlock">
-                        <h3 class="controls-header">Player 1:</h3>
-                        <div><span class="label-small">W:</span> standard thruster</div>
-                        <div><span class="label-small">A, D:</span> rotational thrusters</div>
-                        <div><span class="label-small">S:</span> afterburner</div>
-                        <div><span class="label-small">Q:</span> expand</div>
-                        <div><span class="label-small">E:</span> cloak</div>
+                <div class="contentBody">
+                    <button class="page-selector page-selector-left modal-button" :onclick="() => {
+                        selectedPage--; if (selectedPage < 0) selectedPage += pages
+                    }">&lt;</button>
+                    <div :class="selectedPage % pages === 1 ? 'visiblePage' : 'hiddenPage'">
+                        <div class="modalBody">
+                            <div class="controlsBlock">
+                                <h3 class="controls-header">Player 1:</h3>
+                                <div><span class="label-small">W:</span> standard thruster</div>
+                                <div><span class="label-small">A, D:</span> rotational thrusters</div>
+                                <div><span class="label-small">S:</span> afterburner</div>
+                                <div><span class="label-small">Q:</span> expand</div>
+                                <div><span class="label-small">E:</span> cloak</div>
+                            </div>
+                            <div class="controlsBlock">
+                                <h3 class="controls-header">Player 2:</h3>
+                                <div><span class="label-small">I:</span> standard thruster</div>
+                                <div><span class="label-small">J, L:</span> rotational thrusters</div>
+                                <div><span class="label-small">K:</span> afterburner</div>
+                                <div><span class="label-small">U:</span> expand</div>
+                                <div><span class="label-small">O:</span> cloak</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="controlsBlock">
-                        <h3 class="controls-header">Player 2:</h3>
-                        <div><span class="label-small">I:</span> standard thruster</div>
-                        <div><span class="label-small">J, L:</span> rotational thrusters</div>
-                        <div><span class="label-small">K:</span> afterburner</div>
-                        <div><span class="label-small">U:</span> expand</div>
-                        <div><span class="label-small">O:</span> cloak</div>
-                    </div>
-                    <div class="controlsBlock">
+                    <div :class="selectedPage % pages === 2 ? 'visiblePage' : 'hiddenPage'">
                         <div class="control">
-                            Stage:
-                            <select @input="(event: any) => pickStage(event.target.value)" name="stagePicker"
-                                id="stagePicker">
-                                <option value="random">Random</option>
-                                <option value="battlefield">Battlefield</option>
-                                <option value="finalDestination">Final Destination</option>
-                                <option value="pokemonStadium">Pokemon Stadium</option>
-                                <option value="milkyWay">Milky Way</option>
-                                <option value="maw">Maw</option>
-                                <option value="kongoFalls">Kongo Falls</option>
-                                <option value="freefall">Freefall</option>
-                                <option value="junkyard">Junkyard</option>
-                                <option value="pinball">Pinball</option>
-                                <option value="newtonsCanons">Newton's Cannons</option>
-                                <option value="raceCourseOne">Race Course One</option>
-                                <option value="sol">Sol</option>
-                                <option value="blender">Blender</option>
-                            </select>
+                            <StageSelector />
                         </div>
                         <div class="control">
                             Players:
-                            <select @input="(event: any) => spaceState.setNumberOfPlayers(event.target.value)"
-                                name="numberOfPlayers" id="numberOfPlayers">
-                                <option value="0">0</option>
-                                <option selected value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
+                            <button :class="`radioButton ${spaceState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setNumberOfPlayers(0)">0</button>
+                            <button :class="`radioButton  ${spaceState.numberOfPlayers === 1 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setNumberOfPlayers(1)">1
+                            </button>
+                            <button :class="`radioButton  ${spaceState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setNumberOfPlayers(2)">2
+                            </button>
                         </div>
-                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                        <div class="control">
                             Camera mode:
-                            <select @input="(event: any) => spaceState.setCameraMode(event.target.value)" name="cameraMode"
-                                id="cameraMode">
-                                <option value="fixed">Fixed</option>
-                                <option selected value="0">Track Player 1</option>
-                            </select>
+                            <button
+                                :class="`radioButton  ${spaceState.cameraMode === 'fixed' ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setCameraMode('fixed')">Fixed
+                            </button>
+                            <button :class="`radioButton  ${spaceState.cameraMode === 0 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setCameraMode(0)">Track Player 1
+                            </button>
+                            <button :class="`radioButton  ${spaceState.cameraMode === 1 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setCameraMode(1)">Track Player 2
+                            </button>
                         </div>
-                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                        <div class="control">
                             Game mode:
-                            <select @input="(event: any) => spaceState.setGameMode(event.target.value)" name="gameMode"
-                                id="gameMode">
-                                <option value="race">Race</option>
-                                <option value="battle">Battle</option>
-                            </select>
+                            <button
+                                :class="`radioButton  ${spaceState.gameMode === 'race' ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setGameMode('race')">Race
+                            </button>
+                            <button :class="`radioButton  ${spaceState.gameMode === 'battle' ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.setGameMode('battle')">Battle
+                            </button>
                         </div>
-                        <div v-if="spaceState.numberOfPlayers == 1" class="control">
+                        <div class="control">
                             Zoom:
                             <select @input="(event: any) => spaceState.setZoom(event.target.value)" name="zoom" id="zoom">
                                 <option value="-2.5">-2.5</option>
@@ -117,11 +115,16 @@ export default defineComponent({
                                 <option value="1">1</option>
                             </select>
                         </div>
+                    </div>
+                    <div :class="selectedPage % pages === 0 ? 'visiblePage' : 'hiddenPage'">
                         <MusicControl />
                     </div>
+                    <button class="page-selector page-selector-right modal-button" :onclick="() => {
+                        selectedPage++; if (selectedPage > pages) selectedPage -= pages
+                    }">></button>
                 </div>
                 <div class="start-button">
-                    <button class="napoleonic-button" :onclick="handleFinished">Start Game</button>
+                    <button class="modal-button" :onclick="handleFinished">Start Game</button>
                 </div>
             </div>
         </div>
@@ -129,6 +132,42 @@ export default defineComponent({
 </template>
 
 <style>
+.radioButton {
+    display: inline-block;
+    transition-duration: 0.4s;
+    border: none;
+    padding: 4px 12px;
+    min-width: 40px;
+    font-size: 0.95em;
+    text-align: center;
+    font-family: "Quicksand", sans-serif;
+}
+
+.radioButton:hover {
+    background-color: #ffb7c5;
+    cursor: pointer;
+}
+
+.radioButton.selectedRadioButton {
+    background-color: #dd22aa;
+}
+
+.modal-button.page-selector {
+    height: 100%;
+}
+
+.contentBody {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+.hiddenPage {
+    display: none;
+}
+
 .control {
     margin-bottom: 10px;
 }
@@ -143,6 +182,11 @@ export default defineComponent({
     display: grid;
     gap: 10px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.visiblePage {
+    flex-grow: 4;
+    margin-left: 10px;
 }
 
 @media (max-width: 500px) {
@@ -196,7 +240,6 @@ export default defineComponent({
     background-color: #fff;
     color: #212121;
     padding: 20px 30px 25px 30px;
-    height: inherit;
     min-height: 150px;
     overflow: auto;
     min-height: 150px;
@@ -239,5 +282,21 @@ export default defineComponent({
         position: absolute;
         bottom: 25px;
     }
+}
+
+
+
+.modal-button {
+    transition-duration: 0.4s;
+    border: none;
+    padding: 8px 12px;
+    min-height: 40px;
+    font-size: 0.95em;
+    font-family: "Quicksand", sans-serif;
+}
+
+.modal-button:hover {
+    background-color: #ffb7c5;
+    cursor: pointer;
 }
 </style>
