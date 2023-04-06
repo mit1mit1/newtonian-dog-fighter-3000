@@ -54,7 +54,7 @@ export const getFocalPoint = () =>
     : middleBlackHole;
 
 const baseZoom = -1;
-const minimumZoom = -2.5;
+const minimumZoom = -2.9;
 
 export const adjustZoom = () => {
   const focalPoint = getFocalPoint();
@@ -72,16 +72,18 @@ export const adjustZoom = () => {
       importantObjects.push(goals[shipState.ships[1].nextGoal]);
     }
   }
-  for (const importantObject of importantObjects) {
+  for (const importantObject of importantObjects.filter(
+    (importantObject) => !!importantObject
+  )) {
     if (
       Math.abs(importantObject.positionX - focalPoint.positionX) *
         Math.pow(2, spaceState.zoom + 1.1) >
-      viewboxWidth
+      viewboxWidth * 0.75
     ) {
       if (
         Math.abs(importantObject.positionX - focalPoint.positionX) *
-          Math.pow(2, spaceState.zoom + 1) >
-        viewboxWidth
+          Math.pow(2, spaceState.zoom + 1.05) >
+        viewboxWidth * 0.75
       ) {
         if (spaceState.zoom > minimumZoom) {
           spaceState.zoom -= 0.005;
@@ -95,12 +97,12 @@ export const adjustZoom = () => {
     if (
       Math.abs(importantObject.positionY - focalPoint.positionY) *
         Math.pow(2, spaceState.zoom + 1.1) >
-      viewboxHeight
+      viewboxHeight * 0.75
     ) {
       if (
         Math.abs(importantObject.positionY - focalPoint.positionY) *
-          Math.pow(2, spaceState.zoom + 1) >
-        viewboxHeight
+          Math.pow(2, spaceState.zoom + 1.05) >
+        viewboxHeight * 0.75
       ) {
         if (spaceState.zoom > minimumZoom) {
           spaceState.zoom -= 0.005;
@@ -119,6 +121,7 @@ export const adjustZoom = () => {
   ) {
     console.log("zoom in", spaceState.zoom);
     spaceState.zoom += 0.005;
+    console.log(spaceState.zoom);
     return;
   }
   spaceState.framesSinceZoomOut++;

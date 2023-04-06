@@ -51,19 +51,19 @@ export default defineComponent({
                         <div class="modalBody">
                             <div class="controlsBlock">
                                 <h3 class="controls-header">Player 1:</h3>
-                                <div><span class="label-small">W:</span> standard thruster</div>
-                                <div><span class="label-small">A, D:</span> rotational thrusters</div>
-                                <div><span class="label-small">S:</span> afterburner</div>
-                                <div><span class="label-small">Q:</span> expand</div>
-                                <div><span class="label-small">E:</span> cloak</div>
+                                <div class="controlRow"><span class="label-small">W:</span> standard thruster</div>
+                                <div class="controlRow"><span class="label-small">A, D:</span> rotational thrusters</div>
+                                <div class="controlRow"><span class="label-small">S:</span> afterburner</div>
+                                <div class="controlRow"><span class="label-small">Q:</span> expand</div>
+                                <div class="controlRow"><span class="label-small">E:</span> cloak</div>
                             </div>
                             <div class="controlsBlock">
                                 <h3 class="controls-header">Player 2:</h3>
-                                <div><span class="label-small">I:</span> standard thruster</div>
-                                <div><span class="label-small">J, L:</span> rotational thrusters</div>
-                                <div><span class="label-small">K:</span> afterburner</div>
-                                <div><span class="label-small">U:</span> expand</div>
-                                <div><span class="label-small">O:</span> cloak</div>
+                                <div class="controlRow"><span class="label-small">I:</span> standard thruster</div>
+                                <div class="controlRow"><span class="label-small">J, L:</span> rotational thrusters</div>
+                                <div class="controlRow"><span class="label-small">K:</span> afterburner</div>
+                                <div class="controlRow"><span class="label-small">U:</span> expand</div>
+                                <div class="controlRow"><span class="label-small">O:</span> cloak</div>
                             </div>
                         </div>
                     </div>
@@ -104,16 +104,6 @@ export default defineComponent({
                             <button :class="`radioButton  ${spaceState.gameMode === 'battle' ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => spaceState.setGameMode('battle')">Battle
                             </button>
-                        </div>
-                        <div class="control">
-                            Zoom:
-                            <select @input="(event: any) => spaceState.setZoom(event.target.value)" name="zoom" id="zoom">
-                                <option value="-2.5">-2.5</option>
-                                <option value="-2">-2</option>
-                                <option value="-1" selected>-1</option>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                            </select>
                         </div>
                     </div>
                     <div :class="selectedPage % pages === 0 ? 'visiblePage' : 'hiddenPage'">
@@ -178,10 +168,14 @@ export default defineComponent({
     font-size: 1em;
 }
 
+.controlRow {
+    margin-bottom: 5px;
+}
+
 .modalBody {
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .visiblePage {
@@ -218,9 +212,8 @@ export default defineComponent({
 }
 
 .label-small {
-    min-width: 3em;
+    min-width: 2.3em;
     display: inline-block;
-    text-align: center;
     font-weight: bold;
 }
 

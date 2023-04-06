@@ -28,7 +28,7 @@ export default defineComponent({
         </linearGradient>
     </defs>
 
-    <g v-if="shipState.ships.length > 0">
+    <g v-if="shipState.ships.length > 0 && goals[shipState.ships[0].nextGoal]">
         <text x="50" y="460" font-family="monospace" stroke="url(#grad1)">
             {{ (distanceBetween(goals[shipState.ships[0].nextGoal], shipState.ships[0]) - goals[shipState.ships[0].nextGoal].radius - shipState.ships[0].radius).toFixed(2) }}
         </text>
@@ -39,7 +39,7 @@ export default defineComponent({
             </text>
         </g>
     </g>
-    <g v-if="shipState.ships.length > 1">
+    <g v-if="shipState.ships.length > 1 && goals[shipState.ships[1].nextGoal]">
         <text x="800" y="460" font-family="monospace" stroke="url(#grad2)">
             {{ (distanceBetween(goals[shipState.ships[1].nextGoal], shipState.ships[1]) - goals[shipState.ships[1].nextGoal].radius - shipState.ships[1].radius).toFixed(2) }}
         </text>
