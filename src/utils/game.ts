@@ -5,6 +5,7 @@ import {
   blastZoneRadiusY,
 } from "@/constants/mapNumbers";
 import { distanceSquared } from "./math";
+import { frameMilliseconds } from "@/constants/physics";
 
 export const getPlanetDamage = (
   shipData: { radius: number; positionX: number; positionY: number },
@@ -43,10 +44,13 @@ export const getOutOfMapDamage = (shipData: {
   return 0;
 };
 
-export const isWithinPercentOfBlastZone = (shipData: {
-  positionX: number;
-  positionY: number;
-}, percent: number) => {
+export const isWithinPercentOfBlastZone = (
+  shipData: {
+    positionX: number;
+    positionY: number;
+  },
+  percent: number
+) => {
   const smallestRadii =
     blastZoneRadiusX > blastZoneRadiusY ? blastZoneRadiusY : blastZoneRadiusX;
   const safeCircleRadius = smallestRadii * percent;
@@ -69,3 +73,12 @@ export const getSquaredDistanceFromCenter = (shipData: {
     (shipData.positionY - blastZoneCenterY) ** 2
   );
 };
+
+export const secondsSinceStart = (
+  shipData: { startFrame?: number },
+  frameNumber: number
+) =>
+  (
+    ((frameNumber - (shipData.startFrame || 0)) * frameMilliseconds) /
+    1000
+  ).toFixed(1);

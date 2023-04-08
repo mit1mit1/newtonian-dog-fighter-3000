@@ -20,6 +20,7 @@ export const spaceState = reactive<{
   numberOfPlayers: NumberOfPlayers;
   setNumberOfPlayers: (n: NumberOfPlayers) => void;
   zoom: number;
+  autoZoom: boolean;
   setZoom: (n: number) => void;
   framesSinceZoomOut: number;
 }>({
@@ -44,6 +45,7 @@ export const spaceState = reactive<{
     this.zoom = n;
     this.framesSinceZoomOut = 0;
   },
+  autoZoom: false,
   framesSinceZoomOut: 10,
 });
 
@@ -57,6 +59,9 @@ const baseZoom = -1;
 const minimumZoom = -2.9;
 
 export const adjustZoom = () => {
+  if (!spaceState.autoZoom) {
+    return;
+  }
   const focalPoint = getFocalPoint();
   const importantObjects = [];
   let hasZoomed = false;
@@ -120,7 +125,7 @@ export const adjustZoom = () => {
     spaceState.framesSinceZoomOut > 10
   ) {
     console.log("zoom in", spaceState.zoom);
-    spaceState.zoom += 0.005;
+    spaceState.zoom += 0.001;
     console.log(spaceState.zoom);
     return;
   }

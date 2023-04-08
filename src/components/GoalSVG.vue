@@ -18,8 +18,10 @@ export default defineComponent({
 </script>
 
 <template>
-    <circle class="goalSVG" :cx="positionX" :cy="positionY" :r="radius" fill="transparent" stroke-width="4"
-        :stroke="shipState.ships[0].nextGoal === index ? `yellow` : `green`" />
+    <circle v-if="shipState.ships.length > 0" class="goalSVG" :cx="positionX" :cy="positionY" :r="(radius ?? 0) + 3"
+        fill="transparent" stroke-width="4" :stroke="shipState.ships[0].nextGoal === index ? `url(#grad1)` : `green`" />
+    <circle v-if="shipState.ships.length > 1" class="goalSVG" :cx="positionX" :cy="positionY" :r="(radius ?? 0) - 4"
+        fill="transparent" stroke-width="4" :stroke="shipState.ships[1].nextGoal === index ? `url(#grad2)` : `green`" />
     <text fill="white" stroke="white" class="goalText" :x="(positionX ?? 0) - 11" :y="(positionY ?? 0) + 13">{{ index
     }}</text>
 </template>

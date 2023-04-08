@@ -6,6 +6,7 @@ import { goals } from "./goalState";
 import { planets } from "./planetState";
 import { applyAI, shipState } from "./shipState";
 import type { Stage } from "@/types";
+import { secondsSinceStart } from "@/utils/game";
 
 export const gameState: {
   stage: Stage | "random";
@@ -56,8 +57,8 @@ const updateShipData = () => {
                 " finished " +
                 gameState.stage +
                 " in " +
-                frames +
-                " frames"
+                secondsSinceStart(shipData, gameState.frameNumber) +
+                " seconds"
             );
           } else {
             alert(
@@ -66,8 +67,8 @@ const updateShipData = () => {
                 " finished " +
                 gameState.stage +
                 " in " +
-                frames +
-                " frames"
+                secondsSinceStart(shipData, gameState.frameNumber) +
+                " seconds"
             );
           }
         }
@@ -101,7 +102,7 @@ export const togglePause = () => {
 };
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
-  if (e.key === "p") {
+  if (e.key === "p" || e.key === "Escape") {
     togglePause();
   }
 });

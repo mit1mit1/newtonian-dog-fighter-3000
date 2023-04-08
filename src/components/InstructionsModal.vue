@@ -1,20 +1,24 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import MusicControl from "@/gameMusic/MusicControl.vue";
+// import MusicSelector from "@/components/MusicSelector.vue";
 import StageSelector from "@/components/StageSelector.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
 import { gameState, togglePause } from "@/state/gameState";
 
-let selectedPage = 2;
-const pages = 3;
+let selectedPage = 1;
 
+const modalTitles = ["Controls", "Game settings"
+    // , "Music settings"
+];
+
+const pages = modalTitles.length;
 
 export default defineComponent({
 
     data() {
         return {
-            gameState, spaceState, selectedPage, pages
+            gameState, spaceState, selectedPage, pages, modalTitles
         }
     },
 
@@ -30,7 +34,8 @@ export default defineComponent({
     },
 
     components: {
-        MusicControl, StageSelector,
+        // MusicSelector,
+        StageSelector,
     }
 
 });
@@ -42,12 +47,12 @@ export default defineComponent({
         <div class="visibleModal">
             <div class="modalContent" @keyup.esc="handleFinished" tabindex="0">
                 <button class="modalCloseButton modal-button" :onclick="handleFinished">x</button>
-                <h2 class="modalTitle">Welcome to the arena</h2>
+                <h2 class="modalTitle">{{ modalTitles[selectedPage] }}</h2>
                 <div class="contentBody">
                     <button class="page-selector page-selector-left modal-button" :onclick="() => {
                         selectedPage--; if (selectedPage < 0) selectedPage += pages
                     }">&lt;</button>
-                    <div :class="selectedPage % pages === 1 ? 'visiblePage' : 'hiddenPage'">
+                    <div :class="selectedPage % pages === 0 ? 'visiblePage' : 'hiddenPage'">
                         <div class="modalBody">
                             <div class="controlsBlock">
                                 <h3 class="controls-header">Player 1:</h3>
@@ -67,23 +72,27 @@ export default defineComponent({
                             </div>
                         </div>
                     </div>
-                    <div :class="selectedPage % pages === 2 ? 'visiblePage' : 'hiddenPage'">
+                    <div :class="selectedPage % pages === 1 ? 'visiblePage' : 'hiddenPage'">
                         <div class="control">
                             <StageSelector />
                         </div>
                         <div class="control">
-                            Players:
+                            <div class="label-large">
+                                Players:
+                            </div>
                             <button :class="`radioButton ${spaceState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => spaceState.setNumberOfPlayers(0)">0</button>
                             <button :class="`radioButton  ${spaceState.numberOfPlayers === 1 ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => spaceState.setNumberOfPlayers(1)">1
                             </button>
-                            <button :class="`radioButton  ${spaceState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
-                                :onclick="() => spaceState.setNumberOfPlayers(2)">2
+                        <button :class="`radioButton  ${spaceState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
+                            :onclick="() => spaceState.setNumberOfPlayers(2)">2
                             </button>
                         </div>
                         <div class="control">
-                            Camera mode:
+                            <div class="label-large">
+                                Camera mode:
+                            </div>
                             <button
                                 :class="`radioButton  ${spaceState.cameraMode === 'fixed' ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => spaceState.setCameraMode('fixed')">Fixed
@@ -96,9 +105,21 @@ export default defineComponent({
                             </button>
                         </div>
                         <div class="control">
-                            Game mode:
-                            <button
-                                :class="`radioButton  ${spaceState.gameMode === 'race' ? 'selectedRadioButton' : ''}`"
+                            <div class="label-large">
+                                Zoom:
+                            </div>
+                            <button :class="`radioButton  ${spaceState.autoZoom === true ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.autoZoom = true">Auto
+                            </button>
+                            <button :class="`radioButton  ${spaceState.autoZoom === false ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => spaceState.autoZoom = false">Fixed
+                            </button>
+                        </div>
+                        <div class="control">
+                            <div class="label-large">
+                                Game mode:
+                            </div>
+                            <button :class="`radioButton  ${spaceState.gameMode === 'race' ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => spaceState.setGameMode('race')">Race
                             </button>
                             <button :class="`radioButton  ${spaceState.gameMode === 'battle' ? 'selectedRadioButton' : ''}`"
@@ -106,15 +127,15 @@ export default defineComponent({
                             </button>
                         </div>
                     </div>
-                    <div :class="selectedPage % pages === 0 ? 'visiblePage' : 'hiddenPage'">
-                        <MusicControl />
-                    </div>
+                    <!-- <div :class="selectedPage % pages === 2 ? 'visiblePage' : 'hiddenPage'">
+                                        <MusicSelector />
+                                    </div> -->
                     <button class="page-selector page-selector-right modal-button" :onclick="() => {
-                        selectedPage++; if (selectedPage > pages) selectedPage -= pages
+                        selectedPage++; if (selectedPage >= pages) selectedPage -= pages
                     }">></button>
                 </div>
                 <div class="start-button">
-                    <button class="modal-button" :onclick="handleFinished">Start Game</button>
+                    <button class="modal-button" :onclick="handleFinished">New Game</button>
                 </div>
             </div>
         </div>
@@ -131,15 +152,17 @@ export default defineComponent({
     font-size: 0.95em;
     text-align: center;
     font-family: "Quicksand", sans-serif;
+    border-radius: 2px;
+    margin-right: 4px;
 }
 
 .radioButton:hover {
-    background-color: #ffb7c5;
+    background-color: #d6d6d6;
     cursor: pointer;
 }
 
 .radioButton.selectedRadioButton {
-    background-color: #dd22aa;
+    background-color: #9e9e9e;
 }
 
 .modal-button.page-selector {
@@ -204,17 +227,21 @@ export default defineComponent({
     top: 50px;
     align-items: center;
     justify-content: center;
-    max-width: 1080px;
+    max-width: 800px;
     margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
     font-family: Quicksand;
 }
 
+.label-large {
+    min-width: 7.3em;
+    display: inline-block;
+}
+
 .label-small {
     min-width: 2.3em;
     display: inline-block;
-    font-weight: bold;
 }
 
 @media screen and ((max-height: 480px) or (max-width: 480px)) {
@@ -232,11 +259,11 @@ export default defineComponent({
     width: 90%;
     background-color: #fff;
     color: #212121;
-    padding: 20px 30px 25px 30px;
+    padding: 20px 20px 25px 20px;
     min-height: 150px;
     overflow: auto;
     min-height: 150px;
-    padding-bottom: 50px;
+    padding-bottom: 20px;
     position: relative;
 }
 
@@ -261,22 +288,14 @@ export default defineComponent({
 
 .modalCloseButton {
     position: absolute;
-    top: 5px;
+    top: 0px;
     right: 0px;
-    min-width: 40px;
+    width: 40px;
     height: 40px;
     border: none;
     background-color: transparent;
     cursor: pointer;
 }
-
-@media screen and ((max-height: 480px) or (max-width: 480px)) {
-    .start-button {
-        position: absolute;
-        bottom: 25px;
-    }
-}
-
 
 
 .modal-button {
@@ -289,7 +308,7 @@ export default defineComponent({
 }
 
 .modal-button:hover {
-    background-color: #ffb7c5;
+    background-color: #d6d6d6;
     cursor: pointer;
 }
 </style>

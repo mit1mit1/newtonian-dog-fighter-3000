@@ -121,7 +121,7 @@ html {
 }
 
 .napoleonic-button:hover {
-    background-color: #ffb7c5;
+    background-color: #d6d6d6;
     cursor: pointer;
 }
 </style>

@@ -30,7 +30,9 @@ export default defineComponent({
 
 
 <template>
-    Stage:
+    <div class="label-large">
+        Stage:
+    </div>
     <select @input="(event: any) => pickStage(event.target.value)" name="stagePicker" id="stagePicker">
         <option value="random">Random</option>
         <option value="battlefield">Battlefield</option>
