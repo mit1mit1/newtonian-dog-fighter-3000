@@ -449,29 +449,11 @@ export const applyAI = (playerId: 0 | 1) => {
       noThrustTestPosition.positionY +
       baseShipRadius * Math.sin(shipData.angleRadians),
   };
-  const leftThrustTestPosition = {
-    positionX:
-      shipData.positionX +
-      baseShipRadius * Math.cos(shipData.angleRadians + Math.PI / 8),
-    positionY:
-      shipData.positionY +
-      baseShipRadius * Math.sin(shipData.angleRadians + Math.PI / 8),
-  };
-  const rightThrustTestPosition = {
-    positionX:
-      shipData.positionX +
-      baseShipRadius * Math.cos(shipData.angleRadians - Math.PI / 8),
-    positionY:
-      shipData.positionY +
-      baseShipRadius * Math.sin(shipData.angleRadians - Math.PI / 8),
-  };
   const currentD2C = getSquaredDistanceFromCenter(shipData);
   const noThrustD2C = getSquaredDistanceFromCenter(noThrustTestPosition);
   const forwardThrustD2C = getSquaredDistanceFromCenter(
     forwardThrustTestPosition
   );
-  const leftThrustD2C = getSquaredDistanceFromCenter(leftThrustTestPosition);
-  const rightThrustD2C = getSquaredDistanceFromCenter(rightThrustTestPosition);
   if (isWithinPercentOfBlastZone(shipData, 63 / 100)) {
     if (noThrustD2C > currentD2C && noThrustD2C > forwardThrustD2C) {
       shipState.ships[playerId].rearEngineOn = true;

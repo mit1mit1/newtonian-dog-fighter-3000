@@ -15,7 +15,8 @@ export default defineComponent({
 </script>
 
 <template>
-    <g v-for="asteroid in asteroids">
-        <circle class="asteroid" :cx="asteroid.positionX" :cy="asteroid.positionY" :r="asteroid.radius" fill="grey" />
+    <g v-for="asteroid, index in asteroids"  v-bind:key="`${index}-${asteroid.mass}-${asteroid.radius}`">
+        <circle class="asteroid" :cx="asteroid.positionX"
+            :cy="asteroid.positionY" :r="asteroid.radius" fill="grey" />
     </g>
 </template>

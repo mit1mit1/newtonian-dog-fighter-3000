@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import MusicControl from "@/gameMusic/MusicControl.vue";
 import type { Stage } from "@/types";
 import { gameState } from "@/state/gameState";
 
@@ -8,7 +7,6 @@ import { gameState } from "@/state/gameState";
 export default defineComponent({
 
     data() {
-
         return {
             gameState
         }
@@ -20,10 +18,6 @@ export default defineComponent({
             gameState.stage = stage
         }
     },
-
-    components: {
-        MusicControl,
-    }
 
 });
 </script>

@@ -6,18 +6,17 @@ import ShipSVGs from "./components/ShipSVGs.vue";
 import HealthFuelBarSVGs from "./components/HealthFuelBarSVGs.vue";
 import CompassSVGs from "./components/CompassSVGs.vue";
 import AsteroidSVGs from "./components/AsteroidSVGs.vue";
-import { spaceState, type CameraMode, fixedCamera, getFocalPoint } from "./state/spaceState";
+import { spaceState, fixedCamera, getFocalPoint } from "./state/spaceState";
 import { planets } from "./state/planetState";
 import {
     viewboxWidth, viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
     blastZoneCenterY
 } from "./constants/mapNumbers";
 import InstructionsModal from "./components/InstructionsModal.vue";
-import { shipState, type ShipData } from "./state/shipState";
+import { shipState } from "./state/shipState";
 import { goals } from "./state/goalState";
-import { middleBlackHole } from "./constants/stage";
 
-const getTransform = (cameraMode: CameraMode, zoom: number, ships: Array<ShipData>) => {
+const getTransform = (zoom: number) => {
     const focalPoint = getFocalPoint();
     return `translate(${-focalPoint.positionX + viewboxWidth * Math.pow(2, -1 - zoom)}, ${-focalPoint.positionY + viewboxHeight * Math.pow(2, -1 - zoom)})`
 }
@@ -56,7 +55,7 @@ export default defineComponent({
                     </linearGradient>
                 </defs>
                 <g :transform="`scale(${Math.pow(2, spaceState.zoom)}, ${Math.pow(2, spaceState.zoom)})`">
-                    <g :transform="getTransform(spaceState.cameraMode, spaceState.zoom, shipState.ships)">
+                    <g :transform="getTransform(spaceState.zoom)">
                         <ellipse v-if="spaceState.gameMode === `battle`" fill="url(#space)" :cx="blastZoneCenterX"
                             :cy="blastZoneCenterY" :rx="blastZoneRadiusX" :ry="blastZoneRadiusY" />
                         <PlanetSVG v-bind:key="`${planet.positionX} ${planet.positionY}`" v-for="planet in planets"
@@ -104,24 +103,5 @@ html {
     margin-left: auto;
     margin-right: auto;
     max-width: 1100px;
-}
-
-
-
-.napoleonic-button {
-    margin-right: 10px;
-    margin-bottom: 5px;
-    transition-duration: 0.4s;
-    border: none;
-    padding: 8px 12px;
-    min-height: 40px;
-    min-width: 100px;
-    font-size: 0.95em;
-    font-family: "Quicksand", sans-serif;
-}
-
-.napoleonic-button:hover {
-    background-color: #d6d6d6;
-    cursor: pointer;
 }
 </style>

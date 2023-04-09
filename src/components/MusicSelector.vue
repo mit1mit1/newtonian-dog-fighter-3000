@@ -32,7 +32,7 @@ export default defineComponent({
                 <option value="fonk">Fonk</option>
             </select>
         </div>
-        <button class="napoleonic-button" :onclick="startNewSong">Start new song</button>
+        <button class="modal-button" :onclick="startNewSong">Start new song</button>
     </div>
 
 </template>

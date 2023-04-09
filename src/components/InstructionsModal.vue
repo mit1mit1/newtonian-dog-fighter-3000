@@ -154,6 +154,7 @@ export default defineComponent({
     font-family: "Quicksand", sans-serif;
     border-radius: 2px;
     margin-right: 4px;
+    color: black;
 }
 
 .radioButton:hover {
@@ -305,6 +306,7 @@ export default defineComponent({
     min-height: 40px;
     font-size: 0.95em;
     font-family: "Quicksand", sans-serif;
+    color: black;
 }
 
 .modal-button:hover {
