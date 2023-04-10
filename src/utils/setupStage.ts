@@ -38,6 +38,7 @@ import {
 import { setGoalData } from "@/state/goalState";
 import { planets } from "@/state/planetState";
 import { setShipData, shipState } from "@/state/shipState";
+import { spaceState } from "@/state/spaceState";
 import type { NumberOfPlayers, Stage } from "@/types";
 
 const randomBattleStages: Array<Stage> = [
@@ -267,6 +268,7 @@ export const setupStage = (
           resistanceMultiplier: baseBlackHoleResistanceMultiplyer,
         }
       );
+      spaceState.setZoom(-2.0);
       break;
     case "sol":
       planets.push(sol);
@@ -278,13 +280,23 @@ export const setupStage = (
       planets.push(saturn);
       planets.push(uranus);
       planets.push(pluto);
+      spaceState.setZoom(-2.3);
       break;
     case "blender":
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400))
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400, Math.PI))
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, 0, -1))
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, Math.PI, -1))
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500))
-      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500, Math.PI))
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400));
+      planets.push(
+        getOrbitingPlanet(baseBlackHoleMass / 2, 30, 400, 400, Math.PI)
+      );
+      planets.push(
+        getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, 0, -1)
+      );
+      planets.push(
+        getOrbitingPlanet(baseBlackHoleMass / 2, 30, 900, 900, Math.PI, -1)
+      );
+      planets.push(getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500));
+      planets.push(
+        getOrbitingPlanet(baseBlackHoleMass / 2, 30, 1500, 1500, Math.PI)
+      );
+      spaceState.setZoom(-2.0);
   }
 };

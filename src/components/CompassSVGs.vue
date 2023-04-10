@@ -7,15 +7,24 @@ import { distanceBetween, radiansBetween } from "@/utils/math"
 import { defineComponent } from "vue";
 import { frameMilliseconds } from "@/constants/physics";
 import { secondsSinceStart } from "@/utils/game";
+import ShipSVG from "./ShipSVG.vue";
 
 
 export default defineComponent({
     data() {
         return {
-            shipState, maxHealth, maxFuel, goals, radiansBetween, distanceBetween, gameState, frameMilliseconds, secondsSinceStart
-        }
+            shipState,
+            maxHealth,
+            maxFuel,
+            goals,
+            radiansBetween,
+            distanceBetween,
+            gameState,
+            frameMilliseconds,
+            secondsSinceStart
+        };
     },
-
+    components: { ShipSVG }
 });
 </script>
 
@@ -45,6 +54,11 @@ export default defineComponent({
                 --->
             </text>
         </g>
+
+        <ShipSVG :positionX="150" :positionY="455" :fuel="shipState.ships[0].fuel"
+            :afterburnerOn="shipState.ships[0].afterburnerOn" :rearEngineOn="shipState.ships[0].rearEngineOn"
+            :angleRadians="shipState.ships[0].angleRadians" :radius="5" baseColor="url(#grad1)"
+            secondaryColor="url(#grad2)" />
     </g>
     <g v-if="shipState.ships.length > 1 && goals[shipState.ships[1].nextGoal]">
         <text x="800" y="460" font-family="monospace" stroke="url(#grad2)">
@@ -60,5 +74,9 @@ export default defineComponent({
                 --->
             </text>
         </g>
+        <ShipSVG :positionX="900" :positionY="455" :fuel="shipState.ships[1].fuel"
+            :afterburnerOn="shipState.ships[1].afterburnerOn" :rearEngineOn="shipState.ships[1].rearEngineOn"
+            :angleRadians="shipState.ships[1].angleRadians" :radius="5" baseColor="url(#grad2)"
+            secondaryColor="url(#grad1)" />
     </g>
 </template>

@@ -2,6 +2,7 @@
 import { maxHealth, maxFuel } from "@/constants/ships";
 import { gameState } from "@/state/gameState";
 import { shipState } from "@/state/shipState";
+import ShipSVG from "@/components/ShipSVG.vue";
 import { defineComponent } from "vue";
 
 const handlePlayer1Keypress = (e: KeyboardEvent) => {
@@ -89,6 +90,9 @@ export default defineComponent({
             shipState, pi: Math.PI, maxHealth, maxFuel,
         }
     },
+    components: {
+        ShipSVG,
+    }
 
 });
 </script>
@@ -105,35 +109,15 @@ export default defineComponent({
         </linearGradient>
     </defs>
     <g v-if="shipState.ships.length > 0 && shipState.ships[0].health >= 0">
-        <circle v-if="shipState.ships[0].rearEngineOn && shipState.ships[0].fuel > 0" class="ship1Burner"
-            :cx="shipState.ships[0].positionX - shipState.ships[0].radius" :cy="shipState.ships[0].positionY"
-            :r="shipState.ships[0].radius / 2"
-            :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
-            fill="url(#grad2)" />
-        <circle v-if="shipState.ships[0].afterburnerOn && shipState.ships[0].fuel > 0" class="ship1Afterburner"
-            :cx="shipState.ships[0].positionX - shipState.ships[0].radius" :cy="shipState.ships[0].positionY"
-            :r="2 * shipState.ships[0].radius / 3"
-            :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
-            fill="url(#grad2)" />
-        <circle class="ship1" :cx="shipState.ships[0].positionX" :cy="shipState.ships[0].positionY"
-            :r="shipState.ships[0].radius"
-            :transform="`rotate(${180 * shipState.ships[0].angleRadians / pi}, ${shipState.ships[0].positionX}, ${shipState.ships[0].positionY})`"
-            fill="url(#grad1)" />
+        <ShipSVG :positionX="shipState.ships[0].positionX" :positionY="shipState.ships[0].positionY"
+            :fuel="shipState.ships[0].fuel" :afterburnerOn="shipState.ships[0].afterburnerOn"
+            :rearEngineOn="shipState.ships[0].rearEngineOn" :angleRadians="shipState.ships[0].angleRadians"
+            :radius="shipState.ships[0].radius" baseColor="url(#grad1)" secondaryColor="url(#grad2)" />
     </g>
     <g v-if="shipState.ships.length > 1 && shipState.ships[1].health >= 0">
-        <circle v-if="shipState.ships[1].rearEngineOn && shipState.ships[1].fuel > 0" class="ship2Burner"
-            :cx="shipState.ships[1].positionX - shipState.ships[1].radius" :cy="shipState.ships[1].positionY"
-            :r="shipState.ships[1].radius / 2"
-            :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
-            fill="url(#grad1)" />
-        <circle v-if="shipState.ships[1].afterburnerOn && shipState.ships[1].fuel > 0" class="ship2Afterburner"
-            :cx="shipState.ships[1].positionX - shipState.ships[1].radius" :cy="shipState.ships[1].positionY"
-            :r="2 * shipState.ships[1].radius / 3"
-            :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
-            fill="url(#grad1)" />
-        <circle class="ship2" :cx="shipState.ships[1].positionX" :cy="shipState.ships[1].positionY"
-            :r="shipState.ships[1].radius"
-            :transform="`rotate(${180 * shipState.ships[1].angleRadians / pi}, ${shipState.ships[1].positionX}, ${shipState.ships[1].positionY})`"
-            fill="url(#grad2)" />
+        <ShipSVG :positionX="shipState.ships[1].positionX" :positionY="shipState.ships[1].positionY"
+            :fuel="shipState.ships[1].fuel" :afterburnerOn="shipState.ships[1].afterburnerOn"
+            :rearEngineOn="shipState.ships[1].rearEngineOn" :angleRadians="shipState.ships[1].angleRadians"
+            :radius="shipState.ships[1].radius" baseColor="url(#grad2)" secondaryColor="url(#grad1)" />
     </g>
 </template>
