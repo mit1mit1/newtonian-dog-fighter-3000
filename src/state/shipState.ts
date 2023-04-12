@@ -33,22 +33,35 @@ import { adjustZoom, spaceState } from "./spaceState";
 import { goals } from "./goalState";
 import { gameState } from "./gameState";
 
-export type ShipData = MoveableSphereData & {
+const afterburnerFuelCost = 35;
+const sideEngineFuelCost = 2;
+const rearEngineFuelCost = 4;
+
+type ShipStats = {
+  radius: number;
+  health: number;
+  mass: number;
+  rearEngineThrust: number;
+  sideEngineThrust: number;
+  fuel: number;
+};
+
+type ShipChangeableAttributes = {
   rearEngineOn: boolean;
   leftEngineOn: boolean;
   rightEngineOn: boolean;
   afterburnerOn: boolean;
+  moveLag: boolean;
   angleRadians: number;
   angularMomentum: number;
-  health: number;
-  rearEngineThrust: number;
-  sideEngineThrust: number;
-  moveLag: boolean;
-  fuel: number;
   destroyed: boolean;
   nextGoal: number;
   startFrame?: number;
 };
+
+export type ShipData = MoveableSphereData &
+  ShipStats &
+  ShipChangeableAttributes;
 
 export const shipState = reactive({
   asteroids: [] as Array<MoveableSphereData>,
@@ -243,17 +256,20 @@ export const shipState = reactive({
       shipData.angleRadians = shipData.angleRadians + shipData.angularMomentum;
       shipData.angularMomentum *= 0.985 ** 4;
       if (shipData.leftEngineOn && shipData.fuel > 0) {
-        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+        shipData.fuel =
+          shipData.fuel - frameSpeedMultiplier * sideEngineFuelCost;
         shipData.angularMomentum +=
           frameSpeedMultiplier * shipData.sideEngineThrust;
       }
       if (shipData.rightEngineOn && shipData.fuel > 0) {
-        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 3;
+        shipData.fuel =
+          shipData.fuel - frameSpeedMultiplier * sideEngineFuelCost;
         shipData.angularMomentum -=
           frameSpeedMultiplier * shipData.sideEngineThrust;
       }
       if (shipData.rearEngineOn && shipData.fuel > 0) {
-        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 5;
+        shipData.fuel =
+          shipData.fuel - frameSpeedMultiplier * rearEngineFuelCost;
         shipData.speedX =
           shipData.speedX +
           frameSpeedMultiplier *
@@ -266,7 +282,8 @@ export const shipState = reactive({
             Math.sin(shipData.angleRadians);
       }
       if (shipData.afterburnerOn && shipData.fuel > 0) {
-        shipData.fuel = shipData.fuel - frameSpeedMultiplier * 18;
+        shipData.fuel =
+          shipData.fuel - frameSpeedMultiplier * afterburnerFuelCost;
         shipData.speedX =
           shipData.speedX +
           frameSpeedMultiplier *
@@ -300,48 +317,52 @@ export const shipState = reactive({
   },
 });
 
-const initialShip1Data: ShipData = {
-  positionX: 1,
-  positionY: 1,
-  speedX: 1,
-  speedY: 1,
-  radius: 1,
+const shipAtOrigin: MoveableSphereData = {
+  positionX: 0,
+  positionY: 0,
+  speedX: 0,
+  speedY: 0,
+  mass: baseShipMass,
+  radius: baseShipRadius,
+};
+
+const parkedShip: ShipChangeableAttributes = {
   rearEngineOn: false,
   leftEngineOn: false,
   rightEngineOn: false,
   afterburnerOn: false,
-  angleRadians: 1,
-  angularMomentum: 1,
-  health: 1,
-  rearEngineThrust: 1,
-  sideEngineThrust: 1,
+  angleRadians: 0,
+  angularMomentum: 0,
   moveLag: false,
-  mass: baseShipMass,
-  fuel: maxFuel,
   destroyed: false,
   nextGoal: 0,
 };
 
-const initialShip2Data: ShipData = {
-  positionX: 1,
-  positionY: 1,
-  speedX: 1,
-  speedY: 1,
-  radius: 1,
-  rearEngineOn: false,
-  leftEngineOn: false,
-  rightEngineOn: false,
-  afterburnerOn: false,
-  angleRadians: 1,
-  angularMomentum: 1,
-  health: 1,
-  rearEngineThrust: 1,
-  sideEngineThrust: 1,
-  moveLag: false,
+const legacyShip: ShipStats = {
+  radius: baseShipRadius,
+  rearEngineThrust: 0.0018,
+  sideEngineThrust: 0.0005,
   mass: baseShipMass,
   fuel: maxFuel,
-  destroyed: false,
-  nextGoal: 0,
+  health: maxHealth,
+};
+
+const speederShip: ShipStats = {
+  radius: baseShipRadius * 0.75,
+  rearEngineThrust: 0.0018 * 1.5,
+  sideEngineThrust: 0.0005 * 1.5,
+  mass: baseShipMass / 2,
+  fuel: maxFuel,
+  health: maxHealth,
+};
+
+const bulkyShip: ShipStats = {
+  radius: baseShipRadius * 1.25,
+  rearEngineThrust: 0.0018 * 0.75,
+  sideEngineThrust: 0.0005 * 0.65,
+  mass: baseShipMass * 2,
+  fuel: maxFuel * 1.25,
+  health: maxHealth,
 };
 
 export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
@@ -351,31 +372,9 @@ export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
   if (numberOfPlayers === 0) {
     return;
   }
-  const ship1Data = { ...initialShip1Data };
-  ship1Data.rearEngineOn = false;
-  ship1Data.leftEngineOn = false;
-  ship1Data.rightEngineOn = false;
-  ship1Data.afterburnerOn = false;
-  ship1Data.rearEngineThrust = 0.0018;
-  ship1Data.sideEngineThrust = 0.0005;
-  ship1Data.health = maxHealth;
-  ship1Data.moveLag = false;
-  ship1Data.radius = baseShipRadius;
-  ship1Data.angularMomentum = 0;
-  ship1Data.fuel = maxFuel;
+  const ship1Data = { ...shipAtOrigin, ...bulkyShip, ...parkedShip };
 
-  const ship2Data = { ...initialShip2Data };
-  ship2Data.rearEngineOn = false;
-  ship2Data.leftEngineOn = false;
-  ship2Data.rightEngineOn = false;
-  ship2Data.afterburnerOn = false;
-  ship2Data.rearEngineThrust = 0.0018;
-  ship2Data.sideEngineThrust = 0.0005;
-  ship2Data.health = maxHealth;
-  ship2Data.moveLag = false;
-  ship2Data.radius = baseShipRadius;
-  ship2Data.angularMomentum = 0;
-  ship2Data.fuel = maxFuel;
+  const ship2Data = { ...shipAtOrigin, ...bulkyShip, ...parkedShip };
 
   if (stage === "maw") {
     ship1Data.positionX = viewboxWidth * 0.5;

@@ -95,7 +95,6 @@ export const adjustZoom = () => {
         }
       }
       spaceState.framesSinceZoomOut = 0;
-      console.log("zoom out");
       hasZoomed = true;
       break;
     }
@@ -114,7 +113,6 @@ export const adjustZoom = () => {
         }
       }
       spaceState.framesSinceZoomOut = 0;
-      console.log("zoom out");
       hasZoomed = true;
       break;
     }
@@ -124,9 +122,7 @@ export const adjustZoom = () => {
     !hasZoomed &&
     spaceState.framesSinceZoomOut > 10
   ) {
-    console.log("zoom in", spaceState.zoom);
     spaceState.zoom += 0.001;
-    console.log(spaceState.zoom);
     return;
   }
   spaceState.framesSinceZoomOut++;
