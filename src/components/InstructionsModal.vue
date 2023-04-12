@@ -5,6 +5,7 @@ import StageSelector from "@/components/StageSelector.vue";
 import { spaceState } from "@/state/spaceState";
 import { setupStage } from "@/utils/setupStage";
 import { gameState, togglePause } from "@/state/gameState";
+import { shipState } from "@/state/shipState";
 
 let selectedPage = 1;
 
@@ -18,18 +19,15 @@ export default defineComponent({
 
     data() {
         return {
-            gameState, spaceState, selectedPage, pages, modalTitles
+            gameState, spaceState, selectedPage, pages, modalTitles, shipState
         }
     },
 
 
     methods: {
         handleFinished() {
-            setupStage(gameState.stage, spaceState.numberOfPlayers, spaceState.gameMode === "race")
+            setupStage(gameState.stage, spaceState.gameMode === "race")
             togglePause();
-            setTimeout(() => {
-                spaceState.setIsStarted(true);
-            }, 500)
         },
     },
 
@@ -80,15 +78,15 @@ export default defineComponent({
                             <div class="label-large">
                                 Players:
                             </div>
-                            <button :class="`radioButton ${spaceState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
-                                :onclick="() => spaceState.setNumberOfPlayers(0)">0</button>
-                            <button :class="`radioButton  ${spaceState.numberOfPlayers === 1 ? 'selectedRadioButton' : ''}`"
-                                :onclick="() => spaceState.setNumberOfPlayers(1)">1
+                            <button :class="`radioButton ${shipState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => shipState.numberOfPlayers = 0">0</button>
+                            <button :class="`radioButton  ${shipState.numberOfPlayers === 1 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => shipState.numberOfPlayers = 1">1
                             </button>
-                        <button :class="`radioButton  ${spaceState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
-                            :onclick="() => spaceState.setNumberOfPlayers(2)">2
-                            </button>
-                        </div>
+                            <button :class="`radioButton  ${shipState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
+                                :onclick="() => shipState.numberOfPlayers = 2">2
+                        </button>
+                    </div>
                         <div class="control">
                             <div class="label-large">
                                 Camera mode:
@@ -128,8 +126,8 @@ export default defineComponent({
                         </div>
                     </div>
                     <!-- <div :class="selectedPage % pages === 2 ? 'visiblePage' : 'hiddenPage'">
-                                        <MusicSelector />
-                                    </div> -->
+                                            <MusicSelector />
+                                        </div> -->
                     <button class="page-selector page-selector-right modal-button" :onclick="() => {
                         selectedPage++; if (selectedPage >= pages) selectedPage -= pages
                     }">></button>

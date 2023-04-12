@@ -13,13 +13,13 @@ export const westOrbitingBigPlanet: PlanetData = {
   positionX: 0.5 * viewboxWidth - 290,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
-  mass: 1,
+  mass: baseSunRadius / 2,
   resistanceMultiplier: basePlanetResistanceMultiplyer,
   getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
     return {
       ...currentPlanetData,
-      positionX: 0.5 * viewboxWidth - 290 * Math.cos(frameNumber / 180),
-      positionY: 0.5 * viewboxHeight + 290 * Math.sin(frameNumber / 180),
+      positionX: 0.5 * viewboxWidth - 290 * Math.cos(frameNumber / 280),
+      positionY: 0.5 * viewboxHeight + 290 * Math.sin(frameNumber / 280),
     };
   },
 };
@@ -29,13 +29,13 @@ export const eastOrbitingBigPlanet: PlanetData = {
   positionX: 0.5 * viewboxWidth + 290,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
-  mass: 1,
+  mass: baseSunRadius / 2,
   resistanceMultiplier: basePlanetResistanceMultiplyer,
   getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
     return {
       ...currentPlanetData,
-      positionX: 0.5 * viewboxWidth + 290 * Math.cos(frameNumber / 180),
-      positionY: 0.5 * viewboxHeight - 290 * Math.sin(frameNumber / 180),
+      positionX: 0.5 * viewboxWidth + 290 * Math.cos(frameNumber / 280),
+      positionY: 0.5 * viewboxHeight - 290 * Math.sin(frameNumber / 280),
     };
   },
 };

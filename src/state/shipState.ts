@@ -30,8 +30,9 @@ import {
 } from "@/utils/physics";
 import { isOverlapping } from "@/utils/math";
 import { adjustZoom, spaceState } from "./spaceState";
-import { goals } from "./goalState";
+import { checkpoints } from "./checkpointState";
 import { gameState } from "./gameState";
+import { goals } from "./goalState";
 
 const afterburnerFuelCost = 35;
 const sideEngineFuelCost = 2;
@@ -55,7 +56,8 @@ type ShipChangeableAttributes = {
   angleRadians: number;
   angularMomentum: number;
   destroyed: boolean;
-  nextGoal: number;
+  nextCheckpoint: number;
+  completedGoals: Array<number>;
   startFrame?: number;
 };
 
@@ -66,7 +68,7 @@ export type ShipData = MoveableSphereData &
 export const shipState = reactive({
   asteroids: [] as Array<MoveableSphereData>,
   ships: [] as Array<ShipData>,
-  numberOfPlayers: 2 as NumberOfPlayers,
+  numberOfPlayers: 1 as NumberOfPlayers,
   enlargenShip(playerId: 0 | 1) {
     if (
       this.ships[playerId].radius === baseShipRadius &&
@@ -224,12 +226,22 @@ export const shipState = reactive({
       if (shipData.destroyed) {
         return;
       }
-      const nextGoal = goals[shipData.nextGoal];
-      if (nextGoal && isOverlapping(shipData, nextGoal)) {
-        if (shipData.nextGoal === 0) {
+      goals.forEach((goal, index) => {
+        if (isOverlapping(shipData, goal)) {
+          if (!shipData.startFrame) {
+            shipData.startFrame = gameState.frameNumber;
+          }
+          if (!shipData.completedGoals.includes(index)) {
+            shipData.completedGoals.push(index);
+          }
+        }
+      });
+      const nextCheckpoint = checkpoints[shipData.nextCheckpoint];
+      if (nextCheckpoint && isOverlapping(shipData, nextCheckpoint)) {
+        if (!shipData.startFrame) {
           shipData.startFrame = gameState.frameNumber;
         }
-        shipData.nextGoal++;
+        shipData.nextCheckpoint++;
       }
       shipData.positionX =
         shipData.positionX + frameSpeedMultiplier * shipData.speedX;
@@ -335,7 +347,8 @@ const parkedShip: ShipChangeableAttributes = {
   angularMomentum: 0,
   moveLag: false,
   destroyed: false,
-  nextGoal: 0,
+  nextCheckpoint: 0,
+  completedGoals: [],
 };
 
 const legacyShip: ShipStats = {
@@ -359,16 +372,16 @@ const speederShip: ShipStats = {
 const bulkyShip: ShipStats = {
   radius: baseShipRadius * 1.25,
   rearEngineThrust: 0.0018 * 0.75,
-  sideEngineThrust: 0.0005 * 0.65,
+  sideEngineThrust: 0.0005 * 0.95,
   mass: baseShipMass * 2,
   fuel: maxFuel * 1.25,
   health: maxHealth,
 };
 
-export const setShipData = (stage: Stage, numberOfPlayers: 0 | 1 | 2) => {
+export const setShipData = (stage: Stage) => {
   gameState.stage = stage;
   shipState.ships.splice(0, shipState.ships.length);
-  shipState.numberOfPlayers = numberOfPlayers;
+  const numberOfPlayers = shipState.numberOfPlayers;
   if (numberOfPlayers === 0) {
     return;
   }

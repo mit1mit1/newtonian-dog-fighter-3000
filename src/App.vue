@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import PlanetSVG from "./components/PlanetSVG.vue";
+import CheckpointSVG from "./components/CheckpointSVG.vue";
 import GoalSVG from "./components/GoalSVG.vue";
 import ShipSVGs from "./components/ShipSVGs.vue";
 import HealthFuelBarSVGs from "./components/HealthFuelBarSVGs.vue";
@@ -14,6 +15,7 @@ import {
 } from "./constants/mapNumbers";
 import InstructionsModal from "./components/InstructionsModal.vue";
 import { shipState } from "./state/shipState";
+import { checkpoints } from "./state/checkpointState";
 import { goals } from "./state/goalState";
 
 const getTransform = (zoom: number) => {
@@ -27,11 +29,12 @@ export default defineComponent({
         return {
             planets, viewboxWidth,
             viewboxHeight, blastZoneRadiusX, blastZoneRadiusY, blastZoneCenterX,
-            blastZoneCenterY, spaceState, shipState, fixedCamera, goals, getTransform
+            blastZoneCenterY, spaceState, shipState, fixedCamera, checkpoints, goals, getTransform
         }
     },
 
     components: {
+        CheckpointSVG,
         GoalSVG,
         PlanetSVG,
         ShipSVGs,
@@ -61,7 +64,10 @@ export default defineComponent({
                         <PlanetSVG v-bind:key="`${planet.positionX} ${planet.positionY}`" v-for="planet in planets"
                             :positionX="planet.positionX" :positionY="planet.positionY" :radius="planet.radius"
                             :mass="planet.mass" />
-                        <GoalSVG v-bind:key="`${goal.positionX} ${goal.positionY}`" v-for="goal, index in goals"
+                        <CheckpointSVG v-bind:key="`checkpoint-${checkpoint.positionX} ${checkpoint.positionY}`"
+                            v-for="checkpoint, index in checkpoints" :positionX="checkpoint.positionX"
+                            :positionY="checkpoint.positionY" :radius="checkpoint.radius" :index="index" />
+                        <GoalSVG v-bind:key="`goal-${goal.positionX} ${goal.positionY}`" v-for="goal, index in goals"
                             :positionX="goal.positionX" :positionY="goal.positionY" :radius="goal.radius" :index="index" />
                         <ShipSVGs v-if="spaceState.isStarted" />
                         <AsteroidSVGs v-if="spaceState.isStarted" />

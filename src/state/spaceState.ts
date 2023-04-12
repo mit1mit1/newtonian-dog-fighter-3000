@@ -1,10 +1,11 @@
 // store.js
-import type { NumberOfPlayers } from "@/types";
 import { reactive } from "vue";
 import { shipState } from "./shipState";
 import { middleBlackHole } from "@/constants/stage";
-import { goals } from "./goalState";
+import { checkpoints } from "./checkpointState";
 import { viewboxHeight, viewboxWidth } from "@/constants/mapNumbers";
+import { getNextTarget } from "@/utils/game";
+import { goals } from "./goalState";
 
 export type CameraMode = "fixed" | 0 | 1;
 export const fixedCamera: CameraMode = "fixed";
@@ -12,22 +13,16 @@ type GameMode = "race" | "battle";
 
 export const spaceState = reactive<{
   isStarted: boolean;
-  setIsStarted: (isStarted: boolean) => void;
   cameraMode: CameraMode;
   setCameraMode: (newCameraMode: CameraMode) => void;
   gameMode: GameMode;
-  setGameMode: (newGameMode: GameMode) => void;
-  numberOfPlayers: NumberOfPlayers;
-  setNumberOfPlayers: (n: NumberOfPlayers) => void;
+  setGameMode: (newGameMode: GameMode) => void
   zoom: number;
   autoZoom: boolean;
   setZoom: (n: number) => void;
   framesSinceZoomOut: number;
 }>({
   isStarted: false,
-  setIsStarted(started: boolean) {
-    this.isStarted = started;
-  },
   cameraMode: 0,
   setCameraMode(newCameraMode: CameraMode) {
     this.cameraMode = newCameraMode;
@@ -35,10 +30,6 @@ export const spaceState = reactive<{
   gameMode: "race",
   setGameMode(newGameMode: GameMode) {
     this.gameMode = newGameMode;
-  },
-  numberOfPlayers: 1,
-  setNumberOfPlayers(newNumbersetNumberOfPlayers: NumberOfPlayers) {
-    this.numberOfPlayers = newNumbersetNumberOfPlayers;
   },
   zoom: -1,
   setZoom(n: number) {
@@ -65,16 +56,22 @@ export const adjustZoom = () => {
   const focalPoint = getFocalPoint();
   const importantObjects = [];
   let hasZoomed = false;
-  if (spaceState.numberOfPlayers > 0) {
+  if (shipState.numberOfPlayers > 0) {
     importantObjects.push(shipState.ships[0]);
     if (spaceState.gameMode === "race") {
-      importantObjects.push(goals[shipState.ships[0].nextGoal]);
+      const nextTarget = getNextTarget(shipState.ships[0], goals, checkpoints);
+      if (nextTarget) {
+        importantObjects.push(nextTarget);
+      }
     }
   }
-  if (spaceState.numberOfPlayers > 1) {
+  if (shipState.numberOfPlayers > 1) {
     importantObjects.push(shipState.ships[1]);
     if (spaceState.gameMode === "race") {
-      importantObjects.push(goals[shipState.ships[1].nextGoal]);
+      const nextTarget = getNextTarget(shipState.ships[1], goals, checkpoints);
+      if (nextTarget) {
+        importantObjects.push(nextTarget);
+      }
     }
   }
   for (const importantObject of importantObjects.filter(

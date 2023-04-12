@@ -2,11 +2,23 @@ import { reactive } from "vue";
 import { spaceState } from "./spaceState";
 import { frameMilliseconds } from "@/constants/physics";
 import { setupStage } from "@/utils/setupStage";
-import { goals } from "./goalState";
+import { checkpoints } from "./checkpointState";
 import { planets } from "./planetState";
-import { applyAI, shipState } from "./shipState";
+import { applyAI, shipState, type ShipData } from "./shipState";
 import type { Stage } from "@/types";
 import { secondsSinceStart } from "@/utils/game";
+import { goals } from "./goalState";
+
+const hasCompleted = (shipData: ShipData) => {
+  const finishedCheckpoints =
+    checkpoints.length < 1 ||
+    (shipData.nextCheckpoint && shipData.nextCheckpoint >= checkpoints.length);
+
+  const finishedGoals =
+    goals.length < 1 || shipData.completedGoals.length === goals.length;
+
+  return finishedCheckpoints && finishedGoals;
+};
 
 export const gameState: {
   stage: Stage | "random";
@@ -20,12 +32,9 @@ export const gameState: {
   isPaused: true,
 });
 
-let isRestarting = false;
-let hasSetIsRestarting = false;
-
 const updateShipData = () => {
   // console.time(`frame${gameState.frameNumber}`)
-  if (!isRestarting && spaceState.isStarted) {
+  if (spaceState.isStarted) {
     if (gameState.player2AI) {
       applyAI(1);
     }
@@ -39,12 +48,7 @@ const updateShipData = () => {
       }
     });
     shipState.ships.forEach((shipData, index) => {
-      if (
-        (shipData.health <= 0 ||
-          (shipData.nextGoal && shipData.nextGoal >= goals.length)) &&
-        isRestarting === false &&
-        hasSetIsRestarting === false
-      ) {
+      if (shipData.health <= 0 || hasCompleted(shipData)) {
         if (spaceState.gameMode === "race" && shipData.health > 0) {
           const localStorageIndex = gameState.stage + "record";
           const previousRecord = localStorage.getItem(localStorageIndex);
@@ -72,19 +76,8 @@ const updateShipData = () => {
             );
           }
         }
-        hasSetIsRestarting = true;
-        setTimeout(() => {
-          isRestarting = true;
-        }, 1000);
-        setTimeout(() => {
-          isRestarting = false;
-          hasSetIsRestarting = false;
-          setupStage(
-            "random",
-            shipState.numberOfPlayers,
-            spaceState.gameMode === "race"
-          );
-        }, 1600);
+        spaceState.isStarted = false;
+        togglePause();
       }
     });
   }
@@ -94,6 +87,15 @@ const updateShipData = () => {
 let interval: NodeJS.Timer;
 export const togglePause = () => {
   if (gameState.isPaused) {
+    if (!spaceState.isStarted) {
+      setupStage(
+        "random",
+        spaceState.gameMode === "race"
+      );
+      setTimeout(() => {
+        spaceState.isStarted = true;
+      }, 500);
+    }
     interval = setInterval(updateShipData, frameMilliseconds);
   } else {
     clearInterval(interval);

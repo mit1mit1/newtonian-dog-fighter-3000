@@ -3,9 +3,14 @@ import {
   blastZoneCenterY,
   blastZoneRadiusX,
   blastZoneRadiusY,
+  viewboxHeight,
+  viewboxWidth,
 } from "@/constants/mapNumbers";
-import { distanceSquared } from "./math";
+import { distanceBetween, distanceSquared } from "./math";
 import { frameMilliseconds } from "@/constants/physics";
+import { baseGoalRadius } from "@/constants/goals";
+import type { ShipData } from "@/state/shipState";
+import type { GoalData } from "@/types";
 
 export const getPlanetDamage = (
   shipData: { radius: number; positionX: number; positionY: number },
@@ -82,3 +87,42 @@ export const secondsSinceStart = (
     ((frameNumber - (shipData.startFrame || 0)) * frameMilliseconds) /
     1000
   ).toFixed(1);
+
+export const getGoalAroundPoint = (
+  distanceFromPoint: number,
+  angleRadiansFromPoint: number,
+  pointCentreX: number = 0.5 * viewboxWidth,
+  pointCentreY: number = 0.5 * viewboxHeight
+) => {
+  return {
+    positionX:
+      pointCentreX + distanceFromPoint * Math.sin(angleRadiansFromPoint),
+    positionY:
+      pointCentreY + distanceFromPoint * Math.cos(angleRadiansFromPoint),
+    radius: baseGoalRadius,
+  };
+};
+
+export const getNextTarget = (
+  shipData: ShipData,
+  goals: Array<GoalData>,
+  checkpoints: Array<GoalData>
+) => {
+  if (checkpoints.length && shipData.nextCheckpoint < checkpoints.length) {
+    return checkpoints[shipData.nextCheckpoint];
+  }
+  if (goals.length) {
+    let closestGoal: GoalData | undefined = undefined;
+    goals.forEach((goal, index) => {
+      if (
+        !shipData.completedGoals.includes(index) &&
+        (!closestGoal ||
+          distanceBetween(shipData, goal) <
+            distanceBetween(shipData, closestGoal))
+      ) {
+        closestGoal = goal;
+      }
+    });
+    return closestGoal;
+  }
+};

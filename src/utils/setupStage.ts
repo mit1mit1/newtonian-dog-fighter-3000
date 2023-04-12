@@ -4,10 +4,6 @@ import {
   middleSun,
   westBigPlanet,
   eastBigPlanet,
-  planet3,
-  planet4,
-  planet5,
-  planet6,
   westSun,
   eastSun,
   middleBlackHole,
@@ -36,6 +32,7 @@ import {
   getOrbitingPlanet,
 } from "@/constants/stage";
 import { setGoalData } from "@/state/goalState";
+import { setCheckpointData } from "@/state/checkpointState";
 import { planets } from "@/state/planetState";
 import { setShipData, shipState } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
@@ -66,7 +63,6 @@ const randomRaceStages: Array<Stage> = [
 
 export const setupStage = (
   stage: Stage | "random",
-  numberOfPlayers: NumberOfPlayers,
   isRace?: boolean
 ) => {
   if (stage === "random") {
@@ -78,19 +74,17 @@ export const setupStage = (
         randomBattleStages[Math.floor(random * randomBattleStages.length)];
     }
   }
+  setCheckpointData(stage, isRace);
   setGoalData(stage, isRace);
-  setShipData(stage, numberOfPlayers);
+  setShipData(stage);
   planets.splice(0, planets.length);
   shipState.asteroids.splice(0, shipState.asteroids.length);
+  spaceState.setZoom(-1);
   switch (stage) {
     case "battlefield":
       planets.push(middleSun);
       planets.push(westOrbitingBigPlanet);
       planets.push(eastOrbitingBigPlanet);
-      planets.push(planet3);
-      planets.push(planet4);
-      planets.push(planet5);
-      planets.push(planet6);
       break;
     case "finalDestination":
       planets.push(middleSun);

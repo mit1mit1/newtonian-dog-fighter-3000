@@ -36,3 +36,9 @@ export type PlanetData = {
     currentPlanetData: PlanetData
   ) => PlanetData;
 };
+
+export type GoalData = {
+  positionX: number;
+  positionY: number;
+  radius: number;
+};
