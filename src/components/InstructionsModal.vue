@@ -27,6 +27,7 @@ export default defineComponent({
     methods: {
         handleFinished() {
             setupStage(gameState.stage, spaceState.gameMode === "race")
+            spaceState.isStarted = true;
             togglePause();
         },
     },
