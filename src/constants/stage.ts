@@ -10,7 +10,7 @@ export const baseBlackHoleMass = 100;
 
 export const westOrbitingBigPlanet: PlanetData = {
   damage: 1,
-  positionX: 0.5 * viewboxWidth - 290,
+  positionX: 0.5 * viewboxWidth - 600,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
   mass: baseSunRadius / 2,
@@ -18,15 +18,15 @@ export const westOrbitingBigPlanet: PlanetData = {
   getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
     return {
       ...currentPlanetData,
-      positionX: 0.5 * viewboxWidth - 290 * Math.cos(frameNumber / 280),
-      positionY: 0.5 * viewboxHeight + 290 * Math.sin(frameNumber / 280),
+      positionX: 0.5 * viewboxWidth - 600 * Math.cos(frameNumber / 450),
+      positionY: 0.5 * viewboxHeight + 600 * Math.sin(frameNumber / 450),
     };
   },
 };
 
 export const eastOrbitingBigPlanet: PlanetData = {
   damage: 1,
-  positionX: 0.5 * viewboxWidth + 290,
+  positionX: 0.5 * viewboxWidth + 600,
   positionY: 0.5 * viewboxHeight,
   radius: 30,
   mass: baseSunRadius / 2,
@@ -34,8 +34,8 @@ export const eastOrbitingBigPlanet: PlanetData = {
   getNextPlanetData: (frameNumber: number, currentPlanetData: PlanetData) => {
     return {
       ...currentPlanetData,
-      positionX: 0.5 * viewboxWidth + 290 * Math.cos(frameNumber / 280),
-      positionY: 0.5 * viewboxHeight - 290 * Math.sin(frameNumber / 280),
+      positionX: 0.5 * viewboxWidth + 600 * Math.cos(frameNumber / 450),
+      positionY: 0.5 * viewboxHeight - 600 * Math.sin(frameNumber / 450),
     };
   },
 };

@@ -88,13 +88,8 @@ let interval: NodeJS.Timer;
 export const togglePause = () => {
   if (gameState.isPaused) {
     if (!spaceState.isStarted) {
-      setupStage(
-        "random",
-        spaceState.gameMode === "race"
-      );
-      setTimeout(() => {
-        spaceState.isStarted = true;
-      }, 500);
+      setupStage("random", spaceState.gameMode === "race");
+      spaceState.isStarted = true;
     }
     interval = setInterval(updateShipData, frameMilliseconds);
   } else {

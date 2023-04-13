@@ -37,7 +37,7 @@ export type PlanetData = {
   ) => PlanetData;
 };
 
-export type GoalData = {
+export type Target = {
   positionX: number;
   positionY: number;
   radius: number;

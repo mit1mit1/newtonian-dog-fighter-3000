@@ -31,12 +31,11 @@ import {
   venus,
   getOrbitingPlanet,
 } from "@/constants/stage";
-import { setGoalData } from "@/state/goalState";
-import { setCheckpointData } from "@/state/checkpointState";
 import { planets } from "@/state/planetState";
 import { setShipData, shipState } from "@/state/shipState";
 import { spaceState } from "@/state/spaceState";
-import type { NumberOfPlayers, Stage } from "@/types";
+import type { Stage } from "@/types";
+import { setTargets } from "./setTargets";
 
 const randomBattleStages: Array<Stage> = [
   "battlefield",
@@ -61,10 +60,7 @@ const randomRaceStages: Array<Stage> = [
   "blender",
 ];
 
-export const setupStage = (
-  stage: Stage | "random",
-  isRace?: boolean
-) => {
+export const setupStage = (stage: Stage | "random", isRace?: boolean) => {
   if (stage === "random") {
     const random = Math.random();
     if (isRace) {
@@ -74,9 +70,8 @@ export const setupStage = (
         randomBattleStages[Math.floor(random * randomBattleStages.length)];
     }
   }
-  setCheckpointData(stage, isRace);
-  setGoalData(stage, isRace);
   setShipData(stage);
+  setTargets(stage, isRace);
   planets.splice(0, planets.length);
   shipState.asteroids.splice(0, shipState.asteroids.length);
   spaceState.setZoom(-1);
