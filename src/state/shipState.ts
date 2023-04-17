@@ -338,7 +338,7 @@ const shipAtOrigin: MoveableSphereData = {
   radius: baseShipRadius,
 };
 
-const parkedShip: ShipChangeableAttributes = {
+const getParkedShip = (): ShipChangeableAttributes => ({
   rearEngineOn: false,
   leftEngineOn: false,
   rightEngineOn: false,
@@ -349,7 +349,7 @@ const parkedShip: ShipChangeableAttributes = {
   destroyed: false,
   nextCheckpoint: 0,
   completedGoals: [],
-};
+});
 
 const legacyShip: ShipStats = {
   radius: baseShipRadius,
@@ -385,9 +385,9 @@ export const setShipData = (stage: Stage) => {
   if (numberOfPlayers === 0) {
     return;
   }
-  const ship1Data = { ...shipAtOrigin, ...bulkyShip, ...parkedShip };
+  const ship1Data = { ...shipAtOrigin, ...bulkyShip, ...getParkedShip() };
 
-  const ship2Data = { ...shipAtOrigin, ...bulkyShip, ...parkedShip };
+  const ship2Data = { ...shipAtOrigin, ...bulkyShip, ...getParkedShip() };
 
   if (stage === "maw") {
     ship1Data.positionX = viewboxWidth * 0.5;

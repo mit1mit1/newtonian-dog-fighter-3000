@@ -74,8 +74,8 @@ export default defineComponent({
             {{ (distanceBetween(ship2Target, shipState.ships[1]) -
                 ship2Target.radius - shipState.ships[1].radius).toFixed(0) }} au
         </text>
-        <text v-if="shipState.ships[1].nextCheckpoint > 0" x="960" y="460" font-family="monospace" stroke="url(#grad1)">
-            {{ ((gameState.frameNumber - (shipState.ships[1].startFrame || 0)) * frameMilliseconds / 1000).toFixed(1) }} s
+        <text v-if="shipState.ships[1].startFrame" x="960" y="460" font-family="monospace" stroke="url(#grad1)">
+            {{ secondsSinceStart(shipState.ships[1], gameState.frameNumber) }} s
         </text>
         <g :transform="`rotate(${radiansBetween(ship2Target, shipState.ships[1]) * 180 / Math.PI}, 900, 400)`">
             <text x="900" y="400" font-family="monospace" stroke="url(#grad2)">
