@@ -10,6 +10,9 @@ import { secondsSinceStart } from "@/utils/game";
 import { goals } from "./goalState";
 
 const hasCompleted = (shipData: ShipData) => {
+  if (spaceState.gameMode !== "race") {
+    return false;
+  }
   const finishedCheckpoints =
     checkpoints.length < 1 ||
     (shipData.nextCheckpoint && shipData.nextCheckpoint >= checkpoints.length);

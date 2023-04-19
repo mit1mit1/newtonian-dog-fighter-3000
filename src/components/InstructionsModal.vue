@@ -32,6 +32,11 @@ export default defineComponent({
             }
             togglePause();
         },
+        startNewGame() {
+            setupStage(gameState.stage, spaceState.gameMode === "race")
+            spaceState.isStarted = true;
+            togglePause();
+        },
     },
 
     components: {
@@ -80,16 +85,16 @@ export default defineComponent({
                         <div class="control">
                             <div class="label-large">
                                 Players:
-                            </div>
-                            <button :class="`radioButton ${shipState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
+                        </div>
+                        <button :class="`radioButton ${shipState.numberOfPlayers === 0 ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => shipState.numberOfPlayers = 0">0</button>
                             <button :class="`radioButton  ${shipState.numberOfPlayers === 1 ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => shipState.numberOfPlayers = 1">1
                             </button>
                             <button :class="`radioButton  ${shipState.numberOfPlayers === 2 ? 'selectedRadioButton' : ''}`"
                                 :onclick="() => shipState.numberOfPlayers = 2">2
-                        </button>
-                    </div>
+                            </button>
+                        </div>
                         <div class="control">
                             <div class="label-large">
                                 Camera mode:
@@ -129,14 +134,14 @@ export default defineComponent({
                         </div>
                     </div>
                     <!-- <div :class="selectedPage % pages === 2 ? 'visiblePage' : 'hiddenPage'">
-                                            <MusicSelector />
-                                        </div> -->
+                                                <MusicSelector />
+                                            </div> -->
                     <button class="page-selector page-selector-right modal-button" :onclick="() => {
                         selectedPage++; if (selectedPage >= pages) selectedPage -= pages
                     }">></button>
                 </div>
                 <div class="start-button">
-                    <button class="modal-button" :onclick="handleFinished">New Game</button>
+                    <button class="modal-button" :onclick="startNewGame">New Game</button>
                 </div>
             </div>
         </div>
